@@ -19,14 +19,13 @@ nc::NdArray<double> fisher_yates_shuffle(nc::NdArray<double> input, const int& n
     return input;
 }
 
-nc::NdArray<double> sigmoid(nc::NdArray<double> z, const nc::uint32 n_samples) {
-    auto ones = nc::ones<double>(n_samples, 1);
-    return ones / (ones + nc::exp(-z));
+nc::NdArray<double> sigmoid(nc::NdArray<double> z) {
+    return 1.0 / (1.0 + nc::exp(-z));
 }
 
 double compute_BCE_cost(nc::NdArray<double> predictions, nc::NdArray<double> y, const nc::uint32 n_samples) {
 
-    auto cost = -(1.0 / 150.0) * nc::sum<double>(y * nc::log(predictions) + (1.0 - y) * nc::log(1.0 - predictions)); // cross entropy loss
+    auto cost = -(1.0 / n_samples) * nc::sum<double>(y * nc::log(predictions) + (1.0 - y) * nc::log(1.0 - predictions)); // cross entropy loss
 
     return cost(0, 0); // return it as a double instead of a 1 element nc::NdArray
 
@@ -34,7 +33,7 @@ double compute_BCE_cost(nc::NdArray<double> predictions, nc::NdArray<double> y, 
 
 int main() {
 
-    std::vector<std::vector<double>> data = readCSV("iris.csv");
+    std::vector<std::vector<double>> data = readCSV("iris_binary.csv");
 
     const nc::uint32 n_samples = 150;
     const nc::uint32 n_features = 5; // this counts the labels as a feature, so n_features-1 input features, 1 output feature
@@ -46,8 +45,6 @@ int main() {
             matrix(row, col) = data[row][col];
         }
     }
-
-    // std::cout << matrix({0, n_samples}, {0, n_features}) << std::endl;
 
     matrix = fisher_yates_shuffle(matrix, n_samples);
 
@@ -63,12 +60,12 @@ int main() {
 
     double lr = 0.01;
 
-    nc::NdArray<double> a0 = { { 1, 2 }, { 3, 4 } };
+    nc::NdArray<double> predictions;
 
 
     for (int i = 0; i < n_iters; i++) {
         auto z = nc::dot<double>(X, weights) + bias;
-        auto predictions = sigmoid(z, 150);
+        predictions = sigmoid(z);
 
         auto dw = 1.0 / n_samples * nc::dot(X.transpose(), (predictions - y));
         auto db = 1.0 / n_samples * nc::sum<double>(predictions - y);
@@ -83,15 +80,16 @@ int main() {
         // std::cout << bias << std::endl;
 
 
-        if (i % 80 == 0) {
+        if (i % 10 == 0) {
             auto cost = compute_BCE_cost(predictions, y, n_samples);
             std::cout << "Cost at iteration " << i << ": " << cost << std::endl;
 
-            std::cout << predictions << std::endl;
-        }
-        
+        }        
 
     }
+
+    std::cout << "Final set of predictions: " << "\n";
+    std::cout << predictions << std::endl;
 
 
     return 0;
