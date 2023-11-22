@@ -1,7 +1,7 @@
 #include "NumCpp.hpp"
 #include <iostream>
-#include "csvreader.h"
-#include "logistic_regression.h"
+#include "utils/csvreader.h"
+#include "linear/logistic_regression.h"
 
 nc::NdArray<double> fisher_yates_shuffle(nc::NdArray<double> input, const int& n_samples) {
 
@@ -22,7 +22,7 @@ nc::NdArray<double> fisher_yates_shuffle(nc::NdArray<double> input, const int& n
 
 int main() {
 
-    std::vector<std::vector<double>> data = readCSV("iris_binary.csv");
+    std::vector<std::vector<double>> data = read_csv("data/iris_binary.csv");
 
     const nc::uint32 n_samples = 150;
     const nc::uint32 n_features = 5; // this counts the labels as a feature, so n_features-1 input features, 1 output feature
