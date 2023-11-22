@@ -1,4 +1,5 @@
-#include "csvreader.h"
+#include "utils.h"
+#include "NumCpp.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -47,4 +48,20 @@ std::vector<std::vector<double>> read_csv(const std::string& filename) {
     file.close();
 
     return data;
+}
+
+nc::NdArray<double> fisher_yates_shuffle(nc::NdArray<double> input, const int& n_samples) {
+
+    // shuffle an array, row-wise
+
+    for (int i = n_samples - 1; i > 0; i--) {
+        int j = std::rand() % (i + 1);
+
+        nc::NdArray<double> temp = input(j, input.cSlice());
+        input.put(j, input.cSlice(), input(i, input.cSlice())); 
+        input.put(i, input.cSlice(), temp); 
+
+    }
+
+    return input;
 }

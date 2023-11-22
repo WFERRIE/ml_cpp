@@ -1,23 +1,7 @@
 #include "NumCpp.hpp"
 #include <iostream>
-#include "utils/csvreader.h"
+#include "utils/utils.h"
 #include "linear/logistic_regression.h"
-
-nc::NdArray<double> fisher_yates_shuffle(nc::NdArray<double> input, const int& n_samples) {
-
-    // shuffle an array, row-wise
-
-    for (int i = n_samples - 1; i > 0; i--) {
-        int j = std::rand() % (i + 1);
-
-        nc::NdArray<double> temp = input(j, input.cSlice());
-        input.put(j, input.cSlice(), input(i, input.cSlice())); 
-        input.put(i, input.cSlice(), temp); 
-
-    }
-
-    return input;
-}
 
 
 int main() {
