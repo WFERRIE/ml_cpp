@@ -29,7 +29,7 @@ const nc::NdArray<double>& logistic_regression::get_weights() const {
     return weights;
 }
 
-const double& logistic_regression::get_bias() const {
+const nc::NdArray<double>& logistic_regression::get_bias() const {
     return bias;
 }
 
@@ -39,31 +39,49 @@ void logistic_regression::fit(nc::NdArray<double> X, nc::NdArray<double> y, bool
     int n_samples = X.shape().rows;
     int n_features = X.shape().cols;
 
-    weights = nc::zeros<double>(n_features, 1);
+    n_classes = nc::unique(y).shape().cols;
 
+    weights = nc::zeros<double>(n_features, n_classes);
+    bias = nc::zeros<double>(1, n_classes);
+    
     nc::NdArray<double> predictions;
 
-    for (int i = 0; i < n_iters; i++) {
-        auto z = nc::dot<double>(X, weights) + bias;
-        predictions = sigmoid(z);
+    for (double class_idx = 0.0; class_idx < n_classes; class_idx++) {
 
-        auto dw = 1.0 / n_samples * nc::dot(X.transpose(), (predictions - y));
-        auto db = 1.0 / n_samples * nc::sum<double>(predictions - y);
+        nc::NdArray<double> temp_weights = weights(weights.rSlice(), class_idx);
+        double temp_bias = bias(bias.rSlice(), class_idx)(0, 0);
+
+        nc::NdArray<double> binary_labels = nc::where(y == class_idx, 1.0, 0.0); // mask labels for the current class
+
+        for (int i = 0; i < n_iters; i++) { // training loop
+
+            auto z = nc::dot<double>(X, temp_weights) + temp_bias;
+            predictions = sigmoid(z);
+
+            auto dw = 1.0 / n_samples * nc::dot(X.transpose(), (predictions - binary_labels));
+            auto db = 1.0 / n_samples * nc::sum<double>(predictions - binary_labels);
 
 
-        weights = weights - lr * dw;
-        bias = bias - (lr * db)(0, 0); // convert 1 element nc::NdArray to a double by accessing the (0, 0) index    
-        if (verbose == true) {
-            std::cout << "Cost at iteration " << i << ": " << compute_BCE_cost(predictions, y) << std::endl;
+            temp_weights = temp_weights - lr * dw;
+            temp_bias = temp_bias - (lr * db)(0, 0); // convert 1 element nc::NdArray to a double by accessing the (0, 0) index    
+            if (verbose == true) {
+                std::cout << "Cost at iteration " << i << ": " << compute_BCE_cost(predictions, binary_labels) << std::endl;
+            }
         }
+
+        weights.put(weights.rSlice(), class_idx, temp_weights); //update weights for class that was just trained
+        bias.put(bias.rSlice(), class_idx, temp_bias);
     }
 
 }
 
-nc::NdArray<double> logistic_regression::predict(nc::NdArray<double> X) {
+nc::NdArray<nc::uint32> logistic_regression::predict(nc::NdArray<double> X) {
     int n_samples = X.shape().rows;
-    auto z = nc::dot<double>(X, weights) + bias;
-    nc::NdArray<double> predictions = nc::round(sigmoid(z));
 
-    return predictions;
+    auto z = nc::dot<double>(X, weights) + bias;
+    nc::NdArray<double> predictions = sigmoid(z);
+
+    nc::NdArray<nc::uint32> predictions_out = nc::argmax(predictions, nc::Axis::COL).transpose();
+
+    return predictions_out;
 }

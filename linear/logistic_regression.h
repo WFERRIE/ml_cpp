@@ -7,7 +7,8 @@ class logistic_regression {
 
     private:
         nc::NdArray<double> weights;
-        double bias = 0.0;
+        nc::NdArray<double> bias;
+        int n_classes;
         int n_iters;
         double lr;
 
@@ -24,12 +25,11 @@ class logistic_regression {
 
         const nc::NdArray<double>& get_weights() const;
 
-        const double& get_bias() const;
-
+        const nc::NdArray<double>& get_bias() const;
 
         void fit(nc::NdArray<double> X, nc::NdArray<double> y, bool verbose);
 
-        nc::NdArray<double> predict(nc::NdArray<double> X);  
+        nc::NdArray<nc::uint32> predict(nc::NdArray<double> X);  
 
 };
 

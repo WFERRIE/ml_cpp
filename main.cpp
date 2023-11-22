@@ -22,7 +22,7 @@ nc::NdArray<double> fisher_yates_shuffle(nc::NdArray<double> input, const int& n
 
 int main() {
 
-    std::vector<std::vector<double>> data = read_csv("data/iris_binary.csv");
+    std::vector<std::vector<double>> data = read_csv("data/iris.csv");
 
     const nc::uint32 n_samples = 150;
     const nc::uint32 n_features = 5; // this counts the labels as a feature, so n_features-1 input features, 1 output feature
@@ -39,18 +39,17 @@ int main() {
 
 
     auto y = matrix(matrix.rSlice(), n_features - 1);
+    y--; // set labels to be 0, 1, 2 instead of 1, 2, 3
     auto X = matrix(matrix.rSlice(), {0, n_features - 1});
 
 
-    nc::NdArray<double> a1 = { { 0.25, 0.45}, { 0.55, 0.75 }, { 0.01, 0.99 } };
-
     logistic_regression logit_reg(10000, 0.01);
-    std::cout << logit_reg.get_bias() << std::endl;
     logit_reg.fit(X, y, false);
     std::cout << logit_reg.get_bias() << std::endl;
+    std::cout << logit_reg.get_weights() << std::endl;
     std::cout << logit_reg.predict(X) << std::endl;
 
 
-    // return 0;
+    return 0;
 
 }
