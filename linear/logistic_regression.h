@@ -11,6 +11,7 @@ class logistic_regression {
         int n_classes;
         int n_iters;
         double lr;
+        double tol = 1e-06;
 
         double compute_BCE_cost(nc::NdArray<double> predictions, nc::NdArray<double> y);
 
@@ -29,7 +30,7 @@ class logistic_regression {
 
         void fit(nc::NdArray<double> X, nc::NdArray<double> y, bool verbose);
 
-        nc::NdArray<nc::uint32> predict(nc::NdArray<double> X);  
+        nc::NdArray<double> predict(nc::NdArray<double> X);  
 
 };
 

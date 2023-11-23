@@ -75,13 +75,15 @@ void logistic_regression::fit(nc::NdArray<double> X, nc::NdArray<double> y, bool
 
 }
 
-nc::NdArray<nc::uint32> logistic_regression::predict(nc::NdArray<double> X) {
+nc::NdArray<double> logistic_regression::predict(nc::NdArray<double> X) {
     int n_samples = X.shape().rows;
 
     auto z = nc::dot<double>(X, weights) + bias;
     nc::NdArray<double> predictions = sigmoid(z);
 
-    nc::NdArray<nc::uint32> predictions_out = nc::argmax(predictions, nc::Axis::COL).transpose();
+    nc::NdArray<nc::uint32> predictions_out_int = nc::argmax(predictions, nc::Axis::COL).transpose();
+
+    auto predictions_out = predictions_out_int.astype<double>();
 
     return predictions_out;
 }

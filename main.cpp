@@ -2,6 +2,7 @@
 #include <iostream>
 #include "utils/utils.h"
 #include "linear/logistic_regression.h"
+#include "metrics/metrics.h"
 
 
 int main() {
@@ -26,12 +27,15 @@ int main() {
     y--; // set labels to be 0, 1, 2 instead of 1, 2, 3
     auto X = matrix(matrix.rSlice(), {0, n_features - 1});
 
-
-    logistic_regression logit_reg(10000, 0.01);
+    logistic_regression logit_reg(100000, 0.01);
     logit_reg.fit(X, y, false);
     std::cout << logit_reg.get_bias() << std::endl;
     std::cout << logit_reg.get_weights() << std::endl;
-    std::cout << logit_reg.predict(X) << std::endl;
+
+    auto y_pred = logit_reg.predict(X);
+
+    std::cout << confusion_matrix(y, y_pred) << std::endl;
+    std::cout << accuracy_score(y, y_pred) << std::endl;
 
 
     return 0;
