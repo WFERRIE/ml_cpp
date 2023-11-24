@@ -1,7 +1,7 @@
 #include "NumCpp.hpp"
 #include <iostream>
 #include "utils/utils.h"
-#include "linear/logistic_regression.h"
+#include "models/logistic_regression.h"
 #include "metrics/metrics.h"
 
 
