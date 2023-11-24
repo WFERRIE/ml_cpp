@@ -37,6 +37,23 @@ int main() {
     std::cout << confusion_matrix(y, y_pred) << std::endl;
     std::cout << accuracy_score(y, y_pred) << std::endl;
 
+    std::cout << "f1 score:" << std::endl;
+    std::cout << f1_score(y, y_pred) << std::endl;
+
+    // nc::NdArray<int> a1 = { { 1, 2 }, { 3, 4 }, { 5, 6 } };
+
+    // std::cout << a1 << std::endl;
+
+    // std::cout << a1(a1.rSlice(), 0) << std::endl;
+
+    // std::cout << nc::sum<int>(a1(a1.rSlice(), 0)) << std::endl;
+    // std::cout << nc::sum<int>(a1(a1.rSlice(), 1)) << std::endl;
+
+    // std::cout << nc::sum<int>(a1(0, a1.cSlice()))(0, 0) << std::endl;
+    // std::cout << nc::sum<int>(a1(1, a1.cSlice()))(0, 0) << std::endl;
+    // std::cout << nc::sum<int>(a1(2, a1.cSlice()))(0, 0) << std::endl;
+
+    
 
     return 0;
 
