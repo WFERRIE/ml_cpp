@@ -27,7 +27,7 @@ int main() {
     y--; // set labels to be 0, 1, 2 instead of 1, 2, 3
     auto X = matrix(matrix.rSlice(), {0, n_features - 1});
 
-    logistic_regression logit_reg(10000, 0.01);
+    logistic_regression logit_reg(100000, 0.01, 1);
     logit_reg.fit(X, y, false);
     std::cout << logit_reg.get_bias() << std::endl;
     std::cout << logit_reg.get_weights() << std::endl;

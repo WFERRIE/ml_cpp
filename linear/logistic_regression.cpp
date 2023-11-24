@@ -17,7 +17,7 @@ nc::NdArray<double> logistic_regression::sigmoid(nc::NdArray<double> z) {
 }
 
 
-logistic_regression::logistic_regression(const int& n_iters, const double& lr) : n_iters(n_iters), lr(lr) {
+logistic_regression::logistic_regression(const int& n_iters, const double& lr, const int& init_mode) : n_iters(n_iters), lr(lr), init_mode(init_mode){
     // constructor
 }
 
@@ -36,12 +36,20 @@ const nc::NdArray<double>& logistic_regression::get_bias() const {
 
 void logistic_regression::fit(nc::NdArray<double> X, nc::NdArray<double> y, bool verbose) {
 
-    int n_samples = X.shape().rows;
-    int n_features = X.shape().cols;
+    nc::uint32 n_samples = X.shape().rows;
+    nc::uint32 n_features = X.shape().cols;
 
     n_classes = nc::unique(y).shape().cols;
 
-    weights = nc::zeros<double>(n_features, n_classes);
+    if (init_mode == 1) {
+
+        weights = nc::random::rand<double>({n_features, n_classes}) / 100.0; // initialize weights with small random perturbations around 0
+
+    }
+    else {
+        weights = nc::zeros<double>(n_features, n_classes); // initialize with all weights of 0
+    }
+
     bias = nc::zeros<double>(1, n_classes);
     
     nc::NdArray<double> predictions;
