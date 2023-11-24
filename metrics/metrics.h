@@ -9,4 +9,8 @@ nc::NdArray<double> confusion_matrix(nc::NdArray<double> y_true, nc::NdArray<dou
 
 nc::NdArray<double> f1_score(nc::NdArray<double> y_true, nc::NdArray<double> y_pred);
 
+nc::NdArray<double> precision_score(nc::NdArray<double> y_true, nc::NdArray<double> y_pred);
+
+nc::NdArray<double> recall_score(nc::NdArray<double> y_true, nc::NdArray<double> y_pred);
+
 #endif

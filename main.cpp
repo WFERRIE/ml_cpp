@@ -27,7 +27,7 @@ int main() {
     y--; // set labels to be 0, 1, 2 instead of 1, 2, 3
     auto X = matrix(matrix.rSlice(), {0, n_features - 1});
 
-    logistic_regression logit_reg(100000, 0.01);
+    logistic_regression logit_reg(10000, 0.01);
     logit_reg.fit(X, y, false);
     std::cout << logit_reg.get_bias() << std::endl;
     std::cout << logit_reg.get_weights() << std::endl;
@@ -39,6 +39,9 @@ int main() {
 
     std::cout << "f1 score:" << std::endl;
     std::cout << f1_score(y, y_pred) << std::endl;
+
+    std::cout << precision_score(y, y_pred) << std::endl;
+    std::cout << recall_score(y, y_pred) << std::endl;
 
     // nc::NdArray<int> a1 = { { 1, 2 }, { 3, 4 }, { 5, 6 } };
 
@@ -52,7 +55,6 @@ int main() {
     // std::cout << nc::sum<int>(a1(0, a1.cSlice()))(0, 0) << std::endl;
     // std::cout << nc::sum<int>(a1(1, a1.cSlice()))(0, 0) << std::endl;
     // std::cout << nc::sum<int>(a1(2, a1.cSlice()))(0, 0) << std::endl;
-
     
 
     return 0;
