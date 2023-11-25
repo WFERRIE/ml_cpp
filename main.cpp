@@ -3,6 +3,8 @@
 #include "utils/utils.h"
 #include "models/logistic_regression.h"
 #include "metrics/metrics.h"
+#include <vector>
+#include "models/kmeans.h"
 
 
 int main() {
@@ -27,21 +29,44 @@ int main() {
     y--; // set labels to be 0, 1, 2 instead of 1, 2, 3
     auto X = matrix(matrix.rSlice(), {0, n_features - 1});
 
-    logistic_regression logit_reg(100000, 0.01, 1);
-    logit_reg.fit(X, y, false);
-    std::cout << logit_reg.get_bias() << std::endl;
-    std::cout << logit_reg.get_weights() << std::endl;
 
-    auto y_pred = logit_reg.predict(X);
+    // kmeans k = kmeans(5, 100, 0.01);
 
-    std::cout << confusion_matrix(y, y_pred) << std::endl;
-    std::cout << accuracy_score(y, y_pred) << std::endl;
+    // k.fit(X, false);
 
-    std::cout << "f1 score:" << std::endl;
-    std::cout << f1_score(y, y_pred) << std::endl;
+    // std::cout << "done" << std::endl;
+    nc::NdArray<double> a0 = { { 1.0, 2.0, 3.0 }};
+    nc::NdArray<double> a1 = { { 3.0, 4.0, 5.0 }};
 
-    std::cout << precision_score(y, y_pred) << std::endl;
-    std::cout << recall_score(y, y_pred) << std::endl;
+    std::cout << nc::norm<double>(a0 - a1) << std::endl;
+    std::cout << nc::norm<double>(a1 - a0) << std::endl;
+
+
+
+
+
+
+
+
+
+
+
+
+    // logistic_regression logit_reg(100000, 0.01, 1);
+    // logit_reg.fit(X, y, false);
+    // std::cout << logit_reg.get_bias() << std::endl;
+    // std::cout << logit_reg.get_weights() << std::endl;
+
+    // auto y_pred = logit_reg.predict(X);
+
+    // std::cout << confusion_matrix(y, y_pred) << std::endl;
+    // std::cout << accuracy_score(y, y_pred) << std::endl;
+
+    // std::cout << "f1 score:" << std::endl;
+    // std::cout << f1_score(y, y_pred) << std::endl;
+
+    // std::cout << precision_score(y, y_pred) << std::endl;
+    // std::cout << recall_score(y, y_pred) << std::endl;
 
     // nc::NdArray<int> a1 = { { 1, 2 }, { 3, 4 }, { 5, 6 } };
 
