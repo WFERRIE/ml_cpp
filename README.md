@@ -9,3 +9,4 @@ To do:
 3. CV
 4. KMeans
 5. Scaler
+6. refactor all _get() methods to just be get_params()
