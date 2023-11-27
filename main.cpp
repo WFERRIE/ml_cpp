@@ -3,8 +3,14 @@
 #include "utils/utils.h"
 #include "models/logistic_regression.h"
 #include "metrics/metrics.h"
-#include <vector>
 #include "models/kmeans.h"
+
+
+double calculate_distance(const nc::NdArray<double>& point1, const nc::NdArray<double>& point2) {
+    // calculate the euclidean distance between two points
+    return nc::norm<double>(point1 - point2)(0, 0);
+
+}
 
 
 int main() {
@@ -30,27 +36,17 @@ int main() {
     auto X = matrix(matrix.rSlice(), {0, n_features - 1});
 
 
-    // kmeans k = kmeans(5, 100, 0.01);
+    const int n_clusters = 3;
+    const int max_iter = 100; 
+    const double tol = 0.001;
 
-    // k.fit(X, false);
+    kmeans k = kmeans(n_clusters, max_iter, tol);
 
-    // std::cout << "done" << std::endl;
-    nc::NdArray<double> a0 = { { 1.0, 2.0, 3.0 }};
-    nc::NdArray<double> a1 = { { 3.0, 4.0, 5.0 }};
+    auto final_labels = k.fit(X, false);
 
-    std::cout << nc::norm<double>(a0 - a1) << std::endl;
-    std::cout << nc::norm<double>(a1 - a0) << std::endl;
+    std::cout << final_labels << std::endl;
 
-
-
-
-
-
-
-
-
-
-
+    std::cout << y << std::endl;
 
     // logistic_regression logit_reg(100000, 0.01, 1);
     // logit_reg.fit(X, y, false);

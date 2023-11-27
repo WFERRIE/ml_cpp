@@ -2,7 +2,6 @@
 #define MODELS_KMEANS_H
 
 #include "NumCpp.hpp"
-#include <vector>
 
 class kmeans {
 
@@ -10,16 +9,19 @@ class kmeans {
         int n_clusters;
         int max_iter;
         double tol;
-        std::vector<nc::NdArray<double>> centroids;
-        nc::NdArray<double> labels;
+        nc::NdArray<nc::uint32> labels;
+        nc::NdArray<double> centroids;
 
-        std::vector<nc::NdArray<double>> initialize_centroids(nc::NdArray<double>& X, const int n_clusters);
+        nc::NdArray<double> initialize_centroids(nc::NdArray<double>& X, const int n_clusters);
 
         double calculate_distance(const nc::NdArray<double>& point1, const nc::NdArray<double>& point2);
 
-        void assign_labels();
+        nc::NdArray<nc::uint32> assign_labels(nc::NdArray<double>& X,  nc::NdArray<double>& clusters);
 
-        void update_centroids();
+        nc::NdArray<double> update_centroids(nc::NdArray<double>& X, const int n_clusters, nc::NdArray<nc::uint32> labels);
+
+    
+        
 
         
     public:
@@ -28,10 +30,10 @@ class kmeans {
 
         ~kmeans();
 
-        void fit(nc::NdArray<double>& X, bool verbose);
+        nc::NdArray<nc::uint32> fit(nc::NdArray<double>& X, bool verbose);
 
         void predict(nc::NdArray<double>& X);  
-
+        
 };
 
 #endif
