@@ -1,30 +1,54 @@
-// #include "NumCpp.hpp"
-// #include <iostream>
-// #include "minmax_scaler.h"
+#include "NumCpp.hpp"
+#include <iostream>
+#include "minmax_scaler.h"
 
 
 
 
-// minmax_scaler::minmax_scaler() {
-//     // constructor
-// }
+minmax_scaler::minmax_scaler(int feature_min, int feature_max) : feature_min(feature_min), feature_max(feature_max) {
+    // constructor
+    // checks if feautre_min and feature_max are valid, otherwise throws a runetime error
+    if (feature_min >= feature_max) {
+        throw std::runtime_error("Feature minimum must be less than feature maximum");
+    }
+}
 
-// minmax_scaler::~minmax_scaler() {
-//     // destructor
-// }
+minmax_scaler::~minmax_scaler() {
+    // destructor
+}
 
-// void minmax_scaler::fit() {
+void minmax_scaler::fit(nc::NdArray<double>& X) {
 
-// }
+    min_vals = nc::min(X, nc::Axis::ROW);
+    max_vals = nc::max(X, nc::Axis::ROW);    
 
-// void minmax_scaler::transform() {
+    is_fit = true;
 
-// }
+}
 
-// void minmax_scaler::fit_transform() {
+nc::NdArray<double> minmax_scaler::transform(nc::NdArray<double>& X) {
+    if (!is_fit) {
+        throw std::runtime_error("Scaler has not been fit. Please call the fit() or fit_transform() method before attempting to call the transform() method.");
+    }
 
-// }
+    auto X_scaled = (double)feature_min + (X - min_vals) * (double)(feature_max - feature_min) / (max_vals - min_vals);
 
-// void minmax_scaler::inverse_transform() {
+    return X_scaled;
 
-// }
+}
+
+nc::NdArray<double> minmax_scaler::fit_transform(nc::NdArray<double>& X) {
+    fit(X);
+    return transform(X);
+
+}
+
+nc::NdArray<double> minmax_scaler::inverse_transform(nc::NdArray<double>& X) {
+    if (!is_fit) {
+        throw std::runtime_error("Scaler has not been fit. Please call the fit() or fit_transform() method before attempting to call the inverse_transform() method.");
+    }
+
+    auto X_unscaled = (X - (double)feature_min) * (max_vals - min_vals) / (double)(feature_max - feature_min) + min_vals;
+    return X_unscaled;
+
+}

@@ -5,6 +5,7 @@
 #include "metrics/metrics.h"
 #include "models/kmeans.h"
 #include "preprocessing/standard_scaler.h"
+#include "preprocessing/minmax_scaler.h"
 
 
 double calculate_distance(const nc::NdArray<double>& point1, const nc::NdArray<double>& point2) {
@@ -35,6 +36,28 @@ int main() {
     // auto y = matrix(matrix.rSlice(), n_features - 1);
     // y--; // set labels to be 0, 1, 2 instead of 1, 2, 3
     // auto X = matrix(matrix.rSlice(), {0, n_features - 1});
+
+
+
+
+
+    // testing out minmax scaler
+    nc::NdArray<double> a1 = { { 1, 2 }, { 3, 4 }, { 5, 6 } };
+
+
+    minmax_scaler mm = minmax_scaler();
+    mm.fit(a1);
+    auto a1_t = mm.transform(a1);
+    std::cout << a1_t << std::endl;
+    std::cout << mm.inverse_transform(a1_t) << std::endl;
+
+    std::cout << "========" << std::endl;
+
+    minmax_scaler mm2 = minmax_scaler(-5, 11);
+    auto a1_t2 = mm2.fit_transform(a1);
+    std::cout << a1_t2 << std::endl;
+    std::cout << mm2.inverse_transform(a1_t2) << std::endl;
+
 
 
 
