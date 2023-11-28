@@ -1,5 +1,6 @@
 #include "NumCpp.hpp"
 #include <iostream>
+#include <string>
 #include "utils/utils.h"
 #include "models/logistic_regression.h"
 #include "metrics/metrics.h"
@@ -102,26 +103,30 @@ int main() {
 
 
 
-    // testing out logistic regression
+    // // testing out logistic regression
 
-    std::cout << "attempting to instatiante model" << std::endl;
-    logistic_regression logit_reg("none", 0.1, 100000, 0.01, 1);
-    logit_reg.fit(X, y, false);
+    // const std::string penalty = "l1";
+    // const double reg_strength = 0.1;
+    // const int max_iters = 10000;
+    // const double lr = 0.01;
+    // const double tol = 0.01;
+    // const int init_mode = 1;
+    
+    // logistic_regression logit_reg(penalty, reg_strength, max_iters, lr, tol, init_mode);
+    // logit_reg.fit(X, y, false);
 
-    std::cout << "Fitting Complete" << std::endl;
-
-    auto y_pred = logit_reg.predict(X);
+    // auto y_pred = logit_reg.predict(X);
 
 
-    // testing out evaluation metrics
-    std::cout << confusion_matrix(y, y_pred) << std::endl;
-    std::cout << accuracy_score(y, y_pred) << std::endl;
+    // // testing out evaluation metrics
+    // std::cout << confusion_matrix(y, y_pred) << std::endl;
+    // std::cout << accuracy_score(y, y_pred) << std::endl;
 
-    std::cout << "f1 score:" << std::endl;
-    std::cout << f1_score(y, y_pred) << std::endl;
+    // std::cout << "f1 score:" << std::endl;
+    // std::cout << f1_score(y, y_pred) << std::endl;
 
-    std::cout << precision_score(y, y_pred) << std::endl;
-    std::cout << recall_score(y, y_pred) << std::endl;
+    // std::cout << precision_score(y, y_pred) << std::endl;
+    // std::cout << recall_score(y, y_pred) << std::endl;
 
 
 

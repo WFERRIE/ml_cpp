@@ -10,9 +10,9 @@ class logistic_regression {
         nc::NdArray<double> weights;
         nc::NdArray<double> bias;
         nc::uint32 n_classes;
-        int n_iters;
+        int max_iters;
         double lr;
-        double tol = 1e-06;
+        double tol;
         int init_mode;
         std::string penalty;
         double reg_strength;
@@ -24,7 +24,7 @@ class logistic_regression {
 
     public:
 
-        logistic_regression(const std::string penalty = "l2", const double reg_strength = 0.1, const int n_iters = 1000, const double lr = 0.01, const int init_mode = 1);
+        logistic_regression(const std::string penalty = "l2", const double reg_strength = 0.1, const int max_iters = 1000, const double lr = 0.01, const double tol = 0.0001, const int init_mode = 1);
 
         ~logistic_regression();
 
