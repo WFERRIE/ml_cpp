@@ -1,6 +1,9 @@
 #include "NumCpp.hpp"
 #include "metrics.h"
 
+
+// Classification 
+
 double accuracy_score(nc::NdArray<double> y_true, nc::NdArray<double> y_pred) {
     /*
     Returns the accuracy of the predictions, defined as the number of 
@@ -142,4 +145,29 @@ nc::NdArray<double> recall_score(nc::NdArray<double> y_true, nc::NdArray<double>
 
     return recall_output;
 
+}
+
+
+// Regression
+
+nc::NdArray<double> max_error(nc::NdArray<double> y_true, nc::NdArray<double> y_pred) {
+
+    nc::NdArray<double> error = y_true - y_pred;
+
+    return nc::max(error);
+}
+
+nc::NdArray<double> mean_absolute_error(nc::NdArray<double> y_true, nc::NdArray<double> y_pred) {
+    
+    nc::NdArray<double> error = y_true - y_pred;
+
+    return nc::mean(nc::abs(error));
+
+}
+
+nc::NdArray<double> mean_squared_error(nc::NdArray<double> y_true, nc::NdArray<double> y_pred) {
+
+    nc::NdArray<double> error = y_true - y_pred;
+
+    return nc::mean(nc::power<double>(error, 2));
 }

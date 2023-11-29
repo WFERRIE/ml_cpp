@@ -50,8 +50,14 @@ int main() {
     std::cout << lin_reg.get_bias() << std::endl;
     std::cout << lin_reg.get_weights() << std::endl;
 
-    std::cout << lin_reg.predict(X) << std::endl;
-    std::cout << y << std::endl;
+    nc::NdArray<double> y_pred = lin_reg.predict(X);
+
+    std::cout << "max error: " << max_error(y, y_pred) << std::endl;
+
+    std::cout << "MAE: " << mean_absolute_error(y, y_pred) << std::endl;
+
+    std::cout << "MSE: " << mean_squared_error(y, y_pred) << std::endl;
+
 
 
     // // testing out minmax scaler
