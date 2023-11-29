@@ -27,12 +27,13 @@ double logistic_regression::compute_BCE_cost(nc::NdArray<double>& predictions, n
     return cost(0, 0) + reg_term; // return it as a double instead of a 1 element nc::NdArray
 }
 
+
 nc::NdArray<double> logistic_regression::sigmoid(nc::NdArray<double>& z) {
     return 1.0 / (1.0 + nc::exp(-z));
 }
 
 
-logistic_regression::logistic_regression(const std::string penalty, const double reg_strength, const int max_iters, const double lr, const double tol, const int init_mode) : penalty(penalty), reg_strength(reg_strength), max_iters(max_iters), lr(lr), tol(tol), init_mode(init_mode){
+logistic_regression::logistic_regression(const std::string penalty, const double reg_strength, const int max_iters, const double lr, const double tol, const int init_mode) : penalty(penalty), reg_strength(reg_strength), max_iters(max_iters), lr(lr), tol(tol), init_mode(init_mode) {
     // constructor
     if (lr <= 0) {
         throw std::runtime_error("Learning rate must be greater than 0.");
@@ -70,8 +71,8 @@ void logistic_regression::fit(nc::NdArray<double>& X, nc::NdArray<double>& y, bo
     if (init_mode == 1) {
 
         weights = nc::random::rand<double>({n_features, n_classes}) / 100.0; // initialize weights with small random perturbations around 0
-
     }
+    
     else {
         weights = nc::zeros<double>(n_features, n_classes); // initialize with all weights of 0
     }
@@ -102,8 +103,6 @@ void logistic_regression::fit(nc::NdArray<double>& X, nc::NdArray<double>& y, bo
             else if (penalty == "l2") {
                 dw += (reg_strength / (double)n_samples) * 2.0 * temp_weights;
             }
-
-
 
             temp_weights = temp_weights - lr * dw;
             temp_bias = temp_bias - (lr * db)(0, 0); // convert 1 element nc::NdArray to a double by accessing the (0, 0) index  

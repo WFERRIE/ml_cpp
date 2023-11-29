@@ -43,6 +43,7 @@ int main() {
     const int init_mode = 1;
 
 
+
     standard_scaler ss = standard_scaler();
     auto X_scaled = ss.fit_transform(X);
     linear_regression lin_reg = linear_regression(penalty, reg_strength, max_iters, lr, tol, init_mode);
