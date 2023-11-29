@@ -42,7 +42,7 @@ nc::NdArray<double> linear_regression::add_bias_feature(nc::NdArray<double>& X) 
 
 double linear_regression::compute_cost(nc::NdArray<double>& X, nc::NdArray<double>& y_true) {
 
-    double reg_term = 0.0;
+    double reg_term;
 
     std::cout << "compute_cost() is calling predict()" << std::endl;
 
@@ -56,6 +56,18 @@ double linear_regression::compute_cost(nc::NdArray<double>& X, nc::NdArray<doubl
 
     double cost = nc::mean(nc::power<double>(y_true - y_pred, 2.0))(0, 0);
 
+    if (penalty == "l1") {
+        reg_term = reg_strength * nc::sum(nc::abs(weights))(0, 0);
+    }
+
+    else if (penalty == "l2") {
+        reg_term = reg_strength * nc::sum(nc::power<double>(weights, 2))(0, 0);
+    }
+
+    else {
+        reg_term = 0.0;
+    }
+
     std::cout << "cost: " << cost << std::endl;
 
     return cost + reg_term; // return it as a double instead of a 1 element nc::NdArray
@@ -63,6 +75,10 @@ double linear_regression::compute_cost(nc::NdArray<double>& X, nc::NdArray<doubl
 
 
 nc::NdArray<double> linear_regression::calculate_gradient(nc::NdArray<double>& X, nc::NdArray<double>& y) {
+
+    auto weights_sliced = weights(weights.rSlice(), {1, (int)weights.shape().cols}); // slice weights to not include the first feature, which is the bias feature
+    
+    int n_samples = X.shape().rows;
 
     std::cout << "calculating gradient" << std::endl;
     auto y_pred = predict(X, true);
@@ -75,6 +91,15 @@ nc::NdArray<double> linear_regression::calculate_gradient(nc::NdArray<double>& X
     auto dx = -2.0 * nc::sum<double>(X(X.rSlice(), {1, (int)X.shape().cols}) * (y - y_pred).reshape(-1, 1), nc::Axis::ROW); // dJ/dw_i
 
     std::cout << "calcing grad" << std::endl;
+
+    if (penalty == "l1") {
+        dx -= (reg_strength / (double)n_samples) * nc::where(weights_sliced >= 0.0, 1.0, -1.0);
+    }
+
+    else if (penalty == "l2") {
+        dx -= (reg_strength / (double)n_samples) * 2.0 * weights_sliced;
+    }
+        
     auto grad = nc::hstack({db, dx}); // gradient
 
     std::cout << "calculate_gradient() is retruning the gradient" << std::endl;
