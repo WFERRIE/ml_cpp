@@ -4,15 +4,17 @@
 #include <fstream>
 #include <sstream>
 
-std::vector<std::vector<double>> read_csv(const std::string& filename) {
+nc::NdArray<double> read_csv(const std::string& filename) {
+
     std::vector<std::vector<double>> data;  // Vector to store the CSV data
+    nc::NdArray<double> matrix;
 
     // Open the CSV file
     std::ifstream file(filename);
 
     if (!file.is_open()) {
         std::cerr << "Error: Unable to open the CSV file." << std::endl;
-        return data; // Return an empty vector in case of an error
+        return matrix; // Return an empty vector in case of an error
     }
 
     std::string line;
@@ -36,7 +38,7 @@ std::vector<std::vector<double>> read_csv(const std::string& filename) {
                     row.push_back(value);
                 } catch (const std::invalid_argument&) {
                     std::cerr << "Error: Invalid data format in the CSV file." << std::endl;
-                    return data;
+                    return matrix;
                 }
             }
 
@@ -47,21 +49,17 @@ std::vector<std::vector<double>> read_csv(const std::string& filename) {
     // Close the file
     file.close();
 
-    return data;
-}
+    const int n_samples = data.size();
+    const int n_columns = data[0].size();
 
-nc::NdArray<double> fisher_yates_shuffle(nc::NdArray<double> input, const int& n_samples) {
+    matrix = nc::NdArray<double>(n_samples, n_columns);
 
-    // shuffle an array, row-wise
-
-    for (int i = n_samples - 1; i > 0; i--) {
-        int j = std::rand() % (i + 1);
-
-        nc::NdArray<double> temp = input(j, input.cSlice());
-        input.put(j, input.cSlice(), input(i, input.cSlice())); 
-        input.put(i, input.cSlice(), temp); 
-
+    for(nc::uint32 row = 0; row < n_samples; ++row) {
+        for (nc::uint32 col = 0; col < n_columns; ++col) {
+            matrix(row, col) = data[row][col];
+        }
     }
 
-    return input;
+    return matrix;
 }
+
