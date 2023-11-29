@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include "utils/utils.h"
+#include "models/linear_regression.h"
 #include "models/logistic_regression.h"
 #include "metrics/metrics.h"
 #include "models/kmeans.h"
@@ -9,42 +10,52 @@
 #include "preprocessing/minmax_scaler.h"
 
 
-double calculate_distance(const nc::NdArray<double>& point1, const nc::NdArray<double>& point2) {
-    // calculate the euclidean distance between two points
-    return nc::norm<double>(point1 - point2)(0, 0);
-
-}
-
-
 int main() {
 
-    std::vector<std::vector<double>> data = read_csv("data/iris.csv");
+    std::vector<std::vector<double>> data = read_csv("data/diabetes_regression.csv");
 
-    const nc::uint32 n_samples = 150;
-    const nc::uint32 n_features = 5; // this counts the labels as a feature, so n_features-1 input features, 1 output feature
+    const nc::uint32 n_rows = 442;
+    const nc::uint32 n_columns = 11; // this counts the labels as a feature, so n_features-1 input features, 1 output feature
 
-    auto matrix = nc::NdArray<double>(n_samples, n_features);
+    auto matrix = nc::NdArray<double>(n_rows, n_columns);
 
-    for(nc::uint32 row = 0; row < n_samples; ++row) {
-        for (nc::uint32 col = 0; col < n_features; ++col) {
+    for(nc::uint32 row = 0; row < n_rows; ++row) {
+        for (nc::uint32 col = 0; col < n_columns; ++col) {
             matrix(row, col) = data[row][col];
         }
     }
 
-    matrix = fisher_yates_shuffle(matrix, n_samples);
+    matrix = fisher_yates_shuffle(matrix, n_rows);
 
 
-    auto y = matrix(matrix.rSlice(), n_features - 1);
+    auto y = matrix(matrix.rSlice(), n_columns - 1);
     y--; // set labels to be 0, 1, 2 instead of 1, 2, 3
-    auto X = matrix(matrix.rSlice(), {0, n_features - 1});
+    auto X = matrix(matrix.rSlice(), {0, n_columns - 1});
+
+    // testing out linear regression
 
 
+    const std::string penalty = "l1";
+    const double reg_strength = 0.01;
+    const int max_iters = 100000;
+    const double lr = 0.01;
+    const double tol = 0.0001;
+    const int init_mode = 1;
 
+
+    standard_scaler ss = standard_scaler();
+    auto X_scaled = ss.fit_transform(X);
+    linear_regression lin_reg = linear_regression(penalty, reg_strength, max_iters, lr, tol, init_mode);
+    lin_reg.fit(X_scaled, y, true);
+    std::cout << lin_reg.get_bias() << std::endl;
+    std::cout << lin_reg.get_weights() << std::endl;
+
+    std::cout << lin_reg.predict(X) << std::endl;
+    std::cout << y << std::endl;
 
 
     // // testing out minmax scaler
     // nc::NdArray<double> a1 = { { 1, 2 }, { 3, 4 }, { 5, 6 } };
-
 
     // minmax_scaler mm = minmax_scaler();
     // mm.fit(a1);
