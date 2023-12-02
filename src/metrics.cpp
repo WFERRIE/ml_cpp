@@ -1,5 +1,6 @@
 #include "NumCpp.hpp"
 #include "../include/metrics.hpp"
+#include "../include/validation.hpp"
 
 
 // Classification 
@@ -10,18 +11,43 @@ double accuracy_score(nc::NdArray<double> y_true, nc::NdArray<double> y_pred) {
     correct predictions / total number of predictions.
 
     Returned score is in the range [0.0, 1.0] where 1.0 is a perfect score.
+
+
+    Parameters
+    ----------
+    y_true: 1d numcpp array. Contains the ground-truth labels
+    y_pred: 1d numcpp array. Contains the predicted labels as returned by a classifier.
+
+
+    Returns 
+    ----------
+    score: double. Represents number of correct classifications / total number of labels
+    
     */
     
-    int n_predictions = y_pred.shape().rows;
-    int true_positive = 0;
 
-    for (int i = 0; i < n_predictions; i++) {
-        if (y_true(i, 0) == y_pred(i, 0)) {
-            true_positive++;
-        }
+    check_consistent_shapes(y_true, y_pred);
+
+    nc::NdArray<bool> _equal = nc::equal(y_true, y_pred);
+    
+    int true_positive = nc::sum<int>(_equal.astype<int>())(0, 0);
+    
+    int n_predictions;
+    if (y_true.shape().rows > y_true.shape().cols) {
+        // here we are checking if the labels have more rows or columns, and using the larger
+        // as the total number of predictions. The idea is to make it robust to whether it 
+        // is passed a 1xn or an nx1 set of labels. This should probably be checked in the validation.cpp
+        // file somewhere, but for now Im just going to do it here
+
+        n_predictions = y_true.shape().rows;
     }
+    else {
+        n_predictions = y_true.shape().cols;
+    }
+    
 
-    return (double)true_positive / (double)n_predictions;
+    double score = (double)true_positive / (double)n_predictions;
+    return score;
 }
 
 
