@@ -62,4 +62,3 @@ nc::NdArray<double> read_csv(const std::string& filename) {
 
     return matrix;
 }
-

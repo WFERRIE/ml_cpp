@@ -9,18 +9,18 @@
 #include "include/kmeans.hpp"
 #include "include/standard_scaler.hpp"
 #include "include/minmax_scaler.hpp"
+#include "include/validation.hpp"
 
 
 int main() {
 
-    
 
-    nc::NdArray<double> y_true2 = {1.0, 1.0, 0.0, 1.0, 0.0};
-    nc::NdArray<double> y_pred2 = {1.0, 1.0, 1.0, 0.0, 0.0};
+    nc::NdArray<double> y_true = {1.0, 1.0, 0.0, 1.0, 0.0};
+    nc::NdArray<double> y_pred = {1.0, 1.0, 1.0, 0.0, 0.0};
     
-    
-    std::cout << "Acc: " << accuracy_score(y_true2, y_pred2) << std::endl;
-
+    std::cout << accuracy_score(y_true, y_pred) << std::endl;
+    std::cout << accuracy_score(y_true.transpose(), y_pred.transpose()) << std::endl;
+    // std::cout << nc::sum(y_true2 == y_pred2) << std::endl;
 
     // // testing out linear regression
     // const std::string penalty = "l1";

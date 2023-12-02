@@ -13,6 +13,7 @@ set(SOURCES
     src/minmax_scaler.cpp
     src/standard_scaler.cpp
     src/utils.cpp
+    src/validation.cpp
 )
 
 # Add the header files for your library
@@ -24,6 +25,7 @@ set(HEADERS
     include/minmax_scaler.hpp
     include/standard_scaler.hpp
     include/utils.hpp
+    include/validation.hpp
 )
 
 # Add the executable for your tests
