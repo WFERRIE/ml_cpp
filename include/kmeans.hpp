@@ -1,5 +1,5 @@
-#ifndef MODELS_KMEANS_H
-#define MODELS_KMEANS_H
+#ifndef KMEANS_HPP
+#define KMEANS_HPP
 
 #include "NumCpp.hpp"
 

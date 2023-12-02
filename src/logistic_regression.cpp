@@ -1,6 +1,6 @@
 #include "NumCpp.hpp"
 #include <iostream>
-#include "logistic_regression.h"
+#include "../include/logistic_regression.hpp"
 #include <string>
 
 

@@ -1,5 +1,5 @@
-#ifndef MODELS_LOGISTIC_REGRESSION_H
-#define MODELS_LOGISTIC_REGRESSION_H
+#ifndef LOGISTIC_REGRESSION_HPP
+#define LOGISTIC_REGRESSION_HPP
 
 #include "NumCpp.hpp"
 #include <string>

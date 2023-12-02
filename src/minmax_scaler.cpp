@@ -1,6 +1,6 @@
 #include "NumCpp.hpp"
 #include <iostream>
-#include "minmax_scaler.h"
+#include "../include/minmax_scaler.hpp"
 
 
 

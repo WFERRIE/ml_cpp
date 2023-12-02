@@ -1,6 +1,6 @@
 #include "NumCpp.hpp"
 #include <iostream>
-#include "standard_scaler.h"
+#include "../include/standard_scaler.hpp"
 
 
 standard_scaler::standard_scaler(bool with_mean, bool with_std) : with_mean(with_mean), with_std(with_std), is_fit(false) {

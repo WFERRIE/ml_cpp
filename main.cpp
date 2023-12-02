@@ -1,27 +1,25 @@
 #include "NumCpp.hpp"
 #include <iostream>
 #include <string>
-#include "utils/utils.h"
-#include "utils/dataset.h"
-#include "models/linear_regression.h"
-#include "models/logistic_regression.h"
-#include "metrics/metrics.h"
-#include "models/kmeans.h"
-#include "preprocessing/standard_scaler.h"
-#include "preprocessing/minmax_scaler.h"
+#include "include/utils.hpp"
+#include "include/dataset.hpp"
+#include "include/linear_regression.hpp"
+#include "include/logistic_regression.hpp"
+#include "include/metrics.hpp"
+#include "include/kmeans.hpp"
+#include "include/standard_scaler.hpp"
+#include "include/minmax_scaler.hpp"
 
 
 int main() {
 
-    auto data = read_csv("data/diabetes_regression.csv");
+    
 
-    dataset ds = dataset(data);
-
-    ds.train_test_split(0.7, true);
-
-    std::cout << ds.get_X() << std::endl;
-
-
+    nc::NdArray<double> y_true2 = {1.0, 1.0, 0.0, 1.0, 0.0};
+    nc::NdArray<double> y_pred2 = {1.0, 1.0, 1.0, 0.0, 0.0};
+    
+    
+    std::cout << "Acc: " << accuracy_score(y_true2, y_pred2) << std::endl;
 
 
     // // testing out linear regression

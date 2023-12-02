@@ -1,5 +1,5 @@
-#ifndef METRICS_METRICS_H
-#define METRICS_METRICS_H
+#ifndef METRICS_HPP
+#define METRICS_HPP
 
 #include "NumCpp.hpp"
 

@@ -1,8 +1,8 @@
-#include "utils.h"
 #include "NumCpp.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "../include/utils.hpp"
 
 nc::NdArray<double> read_csv(const std::string& filename) {
 

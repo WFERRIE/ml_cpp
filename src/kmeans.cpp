@@ -1,6 +1,6 @@
 #include "NumCpp.hpp"
 #include <iostream>
-#include "kmeans.h"
+#include "../include/kmeans.hpp"
 
 
 kmeans::kmeans(const int n_clusters, const int max_iter, const double tol) : n_clusters(n_clusters), max_iter(max_iter), tol(tol){

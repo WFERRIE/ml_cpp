@@ -1,6 +1,6 @@
 #include "NumCpp.hpp"
 #include <iostream>
-#include "linear_regression.h"
+#include "../include/linear_regression.hpp"
 #include <string>
 
 linear_regression::linear_regression(const std::string penalty, const double reg_strength, const int max_iters, const double lr, const double tol, const int init_mode) : penalty(penalty), reg_strength(reg_strength), max_iters(max_iters), lr(lr), tol(tol), init_mode(init_mode) {
@@ -77,7 +77,7 @@ double linear_regression::compute_cost(nc::NdArray<double>& X, nc::NdArray<doubl
 nc::NdArray<double> linear_regression::calculate_gradient(nc::NdArray<double>& X, nc::NdArray<double>& y) {
 
     auto weights_sliced = weights(weights.rSlice(), {1, (int)weights.shape().cols}); // slice weights to not include the first feature, which is the bias feature
-    
+
     int n_samples = X.shape().rows;
 
     std::cout << "calculating gradient" << std::endl;
@@ -93,11 +93,11 @@ nc::NdArray<double> linear_regression::calculate_gradient(nc::NdArray<double>& X
     std::cout << "calcing grad" << std::endl;
 
     if (penalty == "l1") {
-        dx -= (reg_strength / (double)n_samples) * nc::where(weights_sliced >= 0.0, 1.0, -1.0);
+        dx += (reg_strength / (double)n_samples) * nc::where(weights_sliced >= 0.0, 1.0, -1.0);
     }
 
     else if (penalty == "l2") {
-        dx -= (reg_strength / (double)n_samples) * 2.0 * weights_sliced;
+        dx += (reg_strength / (double)n_samples) * 2.0 * weights_sliced;
     }
         
     auto grad = nc::hstack({db, dx}); // gradient

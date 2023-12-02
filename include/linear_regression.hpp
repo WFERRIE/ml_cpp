@@ -1,5 +1,5 @@
-#ifndef MODELS_LINEAR_REGRESSION_H
-#define MODELS_LINEAR_REGRESSION_H
+#ifndef LINEAR_REGRESSION_HPP
+#define LINEAR_REGRESSION_HPP
 
 #include "NumCpp.hpp"
 #include <string>

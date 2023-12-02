@@ -1,5 +1,5 @@
 #include "NumCpp.hpp"
-#include "metrics.h"
+#include "../include/metrics.hpp"
 
 
 // Classification 
@@ -11,6 +11,7 @@ double accuracy_score(nc::NdArray<double> y_true, nc::NdArray<double> y_pred) {
 
     Returned score is in the range [0.0, 1.0] where 1.0 is a perfect score.
     */
+    
     int n_predictions = y_pred.shape().rows;
     int true_positive = 0;
 
