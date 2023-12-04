@@ -39,8 +39,6 @@ TEST_CASE("minmax_scaler test", "[minmax_scaler]") {
         minmax_scaler mm = minmax_scaler();
         auto result = mm.fit_transform(X);
 
-        std::cout << result << std::endl;
-
         int elements_correct = nc::sum<int>(nc::equal(expected, result).astype<int>())(0, 0);
 
         REQUIRE(elements_correct == expected.shape().rows * expected.shape().cols);
@@ -60,8 +58,6 @@ TEST_CASE("minmax_scaler test", "[minmax_scaler]") {
         minmax_scaler mm = minmax_scaler();
         auto result = mm.fit_transform(X);
 
-        std::cout << result << std::endl;
-
         int elements_correct = nc::sum<int>(nc::equal(expected, result).astype<int>())(0, 0);
 
         REQUIRE(elements_correct == expected.shape().rows * expected.shape().cols);
@@ -80,8 +76,6 @@ TEST_CASE("minmax_scaler test", "[minmax_scaler]") {
 
         minmax_scaler mm = minmax_scaler();
         auto result = mm.fit_transform(X);
-
-        std::cout << result << std::endl;
 
         int elements_correct = nc::sum<int>(nc::equal(expected, result).astype<int>())(0, 0);
 
