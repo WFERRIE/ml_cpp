@@ -144,7 +144,7 @@ TEST_CASE("minmax_scaler test", "[minmax_scaler]") {
 
     }
 
-        SECTION("Test case 8: fit and then transform negative values ") {
+    SECTION("Test case 8: fit and then transform negative values ") {
         nc::NdArray<double> X = {{0, -100, -5},
                                     {0, 0, -15},
                                     {0, 0, -100}};
@@ -159,6 +159,49 @@ TEST_CASE("minmax_scaler test", "[minmax_scaler]") {
         auto result = mm.transform(X);
 
         int elements_correct = nc::sum<int>(nc::isclose(expected, result).astype<int>())(0, 0);
+
+        REQUIRE(elements_correct == expected.shape().rows * expected.shape().cols);
+
+    }
+
+
+    SECTION("Test case 9: adjust feature range ") {
+        nc::NdArray<double> X = {{1, 2, 3},
+                                {4, 5, 6},
+                                {7, 8, 9}};
+
+        nc::NdArray<double> expected = {{-5, -5, -5},
+                                        {3, 3, 3},
+                                        {11, 11, 11}};
+
+
+        minmax_scaler mm = minmax_scaler(-5, 11);
+        mm.fit(X);
+        auto result = mm.transform(X);
+
+        int elements_correct = nc::sum<int>(nc::isclose(expected, result).astype<int>())(0, 0);
+
+        REQUIRE(elements_correct == expected.shape().rows * expected.shape().cols);
+
+    }
+
+        SECTION("Test case 10: adjust feature range") {
+        nc::NdArray<double> X = {{0, -100, -5},
+                                    {0, 0, -15},
+                                    {0, 0, -100}};
+
+        nc::NdArray<double> expected = {{-5, -5, 11},
+                                        {-5, 11, 9.31578947},
+                                        {-5, 11, -5}};
+
+
+        minmax_scaler mm = minmax_scaler(-5, 11);
+        mm.fit(X);
+        auto result = mm.transform(X);
+
+        int elements_correct = nc::sum<int>(nc::isclose(expected, result).astype<int>())(0, 0);
+
+        std::cout << result << std::endl;
 
         REQUIRE(elements_correct == expected.shape().rows * expected.shape().cols);
 

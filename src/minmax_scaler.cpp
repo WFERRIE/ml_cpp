@@ -34,7 +34,7 @@ nc::NdArray<double> minmax_scaler::transform(nc::NdArray<double>& X) {
 
     auto X_scaled = (double)feature_min + (X - min_vals) * (double)(feature_max - feature_min) / (max_vals - min_vals);
 
-    X_scaled = replace_nan(X_scaled, 0.0);
+    X_scaled = replace_nan(X_scaled, feature_min);
 
     return X_scaled;
 
