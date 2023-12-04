@@ -131,36 +131,16 @@ nc::NdArray<double> f1_score(nc::NdArray<double>& y_true, nc::NdArray<double>& y
         double precision_denom = nc::sum<double>(c_matrix(c_matrix.rSlice(), class_idx))(0, 0);
         double recall_denom = nc::sum<double>(c_matrix(class_idx, c_matrix.cSlice()))(0, 0);
 
+        precision = true_positive / precision_denom; 
 
-        // the following is a bit messy and should be cleaned up. The idea is just to handle for
-        // 0s in the denominators, otherwise it will set the f1 as -nan, which is okay, but then
-        // causes issues during testing. Instead we will just set them to 0 in this case to make
-        // testing easier.
-        if (precision_denom == 0.0) {
-            precision = 0.0;
-        }
-        else {
-            precision = true_positive / precision_denom; 
-        }
+        recall = true_positive / recall_denom;
 
-        if (recall_denom == 0.0) {
-            recall = 0.0;
-        }
-
-        else {
-            recall = true_positive / recall_denom;
-        }
-
-        if ((precision + recall) == 0) {
-            f1 = 0;
-        }
-        else {
-            f1 = (2 * precision * recall) / (precision + recall);
-        }
+        f1 = (2 * precision * recall) / (precision + recall);
         
-
         f1_output.put(0, class_idx, f1);
     }
+
+    f1_output = replace_nan(f1_output, 0.0); // replace any NaN values with 0
 
     return f1_output;
 
@@ -180,21 +160,18 @@ nc::NdArray<double> precision_score(nc::NdArray<double>& y_true, nc::NdArray<dou
     nc::NdArray<double> precision_output = nc::zeros<double>(1, n_classes);
 
     for (int class_idx = 0; class_idx < n_classes; class_idx++) {
-        double precision;
 
         double true_positive = c_matrix(class_idx, class_idx);
 
         double precision_denom = nc::sum<double>(c_matrix(c_matrix.rSlice(), class_idx))(0, 0);
 
-        if (precision_denom == 0) {
-            precision = 0;
-        }
-        else {
-            precision = true_positive / precision_denom;
-        }
+        double precision = true_positive / precision_denom;
 
         precision_output.put(0, class_idx, precision);
+
     }
+
+    precision_output = replace_nan(precision_output, 0.0); // replace any NaN values with 0
 
     return precision_output;
 
@@ -216,21 +193,17 @@ nc::NdArray<double> recall_score(nc::NdArray<double>& y_true, nc::NdArray<double
     nc::NdArray<double> recall_output = nc::zeros<double>(1, n_classes);
 
     for (int class_idx = 0; class_idx < n_classes; class_idx++) {
-        double recall;
 
         double true_positive = c_matrix(class_idx, class_idx);
 
         double recall_denom = nc::sum<double>(c_matrix(class_idx, c_matrix.cSlice()))(0, 0);
 
-        if (recall_denom == 0) {
-            recall = 0;
-        }
-        else {
-            recall = true_positive / recall_denom;
-        }
+        double recall = true_positive / recall_denom;
 
         recall_output.put(0, class_idx, recall);
     }
+
+    recall_output = replace_nan(recall_output, 0.0);
 
     return recall_output;
 

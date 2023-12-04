@@ -25,3 +25,15 @@ int get_n_samples(nc::NdArray<double>& y_true) {
 
     return n_predictions;
 }
+
+
+nc::NdArray<double> replace_nan(nc::NdArray<double>& X, double val) {
+
+    for (auto& element : X) {
+        if (nc::isnan(element)) {
+            element = val;
+        }
+    }
+
+    return X;
+}
