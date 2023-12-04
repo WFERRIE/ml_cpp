@@ -1,6 +1,7 @@
 #include "NumCpp.hpp"
 #include "../include/metrics.hpp"
 #include "../include/validation.hpp"
+#include <algorithm> // std::max
 
 
 // Classification 
@@ -15,8 +16,8 @@ double accuracy_score(nc::NdArray<double> y_true, nc::NdArray<double> y_pred) {
 
     Parameters
     ----------
-    y_true: 1d numcpp array. Contains the ground-truth labels
-    y_pred: 1d numcpp array. Contains the predicted labels as returned by a classifier.
+    y_true: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the ground-truth labels
+    y_pred: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the predicted labels as returned by a classifier.
 
 
     Returns 
@@ -25,28 +26,19 @@ double accuracy_score(nc::NdArray<double> y_true, nc::NdArray<double> y_pred) {
     
     */
     
+    y_true.reshape(-1, 1);
+    y_pred.reshape(-1, 1);
 
     check_consistent_shapes(y_true, y_pred);
+
+    int n_samples = y_true.shape().rows;
 
     nc::NdArray<bool> _equal = nc::equal(y_true, y_pred);
     
     int true_positive = nc::sum<int>(_equal.astype<int>())(0, 0);
     
-    int n_predictions;
-    if (y_true.shape().rows > y_true.shape().cols) {
-        // here we are checking if the labels have more rows or columns, and using the larger
-        // as the total number of predictions. The idea is to make it robust to whether it 
-        // is passed a 1xn or an nx1 set of labels. This should probably be checked in the validation.cpp
-        // file somewhere, but for now Im just going to do it here
 
-        n_predictions = y_true.shape().rows;
-    }
-    else {
-        n_predictions = y_true.shape().cols;
-    }
-    
-
-    double score = (double)true_positive / (double)n_predictions;
+    double score = (double)true_positive / (double)n_samples;
     return score;
 }
 
@@ -60,26 +52,53 @@ nc::NdArray<double> confusion_matrix(nc::NdArray<double> y_true, nc::NdArray<dou
     column, C(i, j) is the number of observations in group i, predicted to be in group j.
     */
 
-    int n_predictions = y_true.shape().rows;
-    auto classes = nc::unique(y_true);
+    /*
+    Returns an n_classes x n_classes confusion matrix of the predictions. 
+    Rows represent the true labels, and columns the predicted labels.
+
+    For confusion matrix C, the value at the i-th row and j-th column, C(i, j) is the
+    number of observations in group i, predicted to be in group j.
+
+    i < n_classes, j < n_classes
+
+    Parameters
+    ----------
+    y_true: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the ground-truth labels
+    y_pred: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the predicted labels as returned by a classifier.
+
+
+    Returns 
+    ----------
+    c_matrix: nc::NdArray<double> of shape (n_classes x n_classes). 
+
+    
+    Issues / to do
+    ----------
+    this function only works when the classes are continuous starting at zero. For example, [0, 1, 2] is a valid
+    set of classes, however, [1, 88, 100] is going to cause issues. This needs to be fixed by normalizing the classes
+    before processing them.
+    
+    */
+    y_true.reshape(-1, 1);
+    y_pred.reshape(-1, 1);
+
+    check_consistent_shapes(y_true, y_pred);
+
+    int n_samples = y_true.shape().rows;
+    auto classes = nc::unique(nc::vstack({y_true, y_pred}));
     int n_classes = classes.shape().cols;
 
-    nc::NdArray<double> confusion_matrix = nc::zeros<double>(n_classes, n_classes);
+    nc::NdArray<double> c_matrix = nc::zeros<double>(n_classes, n_classes);
 
-
-    for (int i = 0; i < n_predictions; i++) {
-        
+    for (int i = 0; i < n_samples; i++) {
         auto true_val = y_true(i, 0);
         auto predicted_val = y_pred(i, 0);
-        
-        int count = confusion_matrix(true_val, predicted_val);
-        count++;
-
-        confusion_matrix.put(true_val, predicted_val, count);
-
+        int count = c_matrix(true_val, predicted_val); // get current value at C(i, j)
+        count++; // incrememnt that value by one
+        c_matrix.put(true_val, predicted_val, count); // put the incremented value back at C(i, j)
     }
 
-    return confusion_matrix;
+    return c_matrix;
 
 }
 
