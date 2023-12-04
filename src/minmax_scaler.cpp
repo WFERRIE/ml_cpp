@@ -1,6 +1,7 @@
 #include "NumCpp.hpp"
 #include <iostream>
 #include "../include/minmax_scaler.hpp"
+#include "../include/validation.hpp"
 
 
 
@@ -32,6 +33,8 @@ nc::NdArray<double> minmax_scaler::transform(nc::NdArray<double>& X) {
     }
 
     auto X_scaled = (double)feature_min + (X - min_vals) * (double)(feature_max - feature_min) / (max_vals - min_vals);
+
+    X_scaled = replace_nan(X_scaled, 0.0);
 
     return X_scaled;
 
