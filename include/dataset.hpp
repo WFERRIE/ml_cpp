@@ -34,6 +34,12 @@ class dataset {
         nc::NdArray<double> get_X();
         nc::NdArray<double> get_y();
 
+        nc::NdArray<double> get_X_train();
+        nc::NdArray<double> get_y_train();
+
+        nc::NdArray<double> get_X_test();
+        nc::NdArray<double> get_y_test();
+
 
 };
 

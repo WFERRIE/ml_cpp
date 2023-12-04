@@ -49,7 +49,6 @@ void dataset::train_test_split(double train_size, bool shuffle) {
     X = data(data.rSlice(), {0, n_columns - 1});
 
     int train_idx_end = (int)(train_size * (double)n_samples);
-    std::cout << train_idx_end << std::endl;
 
     y_train = y({0, train_idx_end} , y.cSlice());
     y_test = y({train_idx_end, n_samples}, y.cSlice());
@@ -86,4 +85,31 @@ nc::NdArray<double> dataset::get_y() {
         std::runtime_error("Error: please call .train_test_split() before attempting to use getters or setters.");
     }
     return y;
+}
+
+nc::NdArray<double> dataset::get_X_train() {
+    if (!train_test_set) {
+        std::runtime_error("Error: please call .train_test_split() before attempting to use getters or setters.");
+    }
+    return X_train;
+}
+nc::NdArray<double> dataset::get_y_train() {
+    if (!train_test_set) {
+        std::runtime_error("Error: please call .train_test_split() before attempting to use getters or setters.");
+    }
+    return y_train;
+}
+
+
+nc::NdArray<double> dataset::get_X_test() {
+    if (!train_test_set) {
+        std::runtime_error("Error: please call .train_test_split() before attempting to use getters or setters.");
+    }
+    return X_test;
+}
+nc::NdArray<double> dataset::get_y_test() {
+    if (!train_test_set) {
+        std::runtime_error("Error: please call .train_test_split() before attempting to use getters or setters.");
+    }
+    return y_test;
 }
