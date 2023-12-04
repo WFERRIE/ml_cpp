@@ -29,7 +29,7 @@ set(HEADERS
 )
 
 # Add the executable for your tests
-add_executable(tests tests/test_metrics.cpp tests/test_minmax_scaler.cpp)
+add_executable(tests tests/test_metrics.cpp tests/test_minmax_scaler.cpp tests/test_standard_scaler.cpp)
 
 find_package(NumCpp 2.12.1 REQUIRED)
 find_package (Catch2 3 REQUIRED)

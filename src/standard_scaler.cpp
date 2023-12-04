@@ -1,6 +1,7 @@
 #include "NumCpp.hpp"
 #include <iostream>
 #include "../include/standard_scaler.hpp"
+#include "../include/validation.hpp"
 
 
 standard_scaler::standard_scaler(bool with_mean, bool with_std) : with_mean(with_mean), with_std(with_std), is_fit(false) {
@@ -28,17 +29,19 @@ nc::NdArray<double> standard_scaler::transform(nc::NdArray<double>& X) {
         throw std::runtime_error("Scaler has not been fit. Please call the fit() method before attempting to call the transform() method.");
     }
 
-    nc::NdArray<double> scaled_X = X;
+    nc::NdArray<double> X_scaled = X;
 
     if (with_mean) {
-        scaled_X -= means;
+        X_scaled -= means;
     }
 
     if (with_std) {
-        scaled_X /= stds;
+        X_scaled /= stds;
     }
 
-    return scaled_X;
+    X_scaled = replace_nan(X_scaled, 0.0);
+
+    return X_scaled;
 
 }
 

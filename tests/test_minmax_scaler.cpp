@@ -147,10 +147,10 @@ TEST_CASE("minmax_scaler test", "[minmax_scaler]") {
         SECTION("Test case 8: fit and then transform negative values ") {
         nc::NdArray<double> X = {{0, -100, -5},
                                     {0, 0, -15},
-                                    {0, 0, -15}};
+                                    {0, 0, -100}};
 
         nc::NdArray<double> expected = {{0, 0, 1},
-                                        {0, 1, 0},
+                                        {0, 1, 0.89473684},
                                         {0, 1, 0}};
 
 
@@ -158,7 +158,7 @@ TEST_CASE("minmax_scaler test", "[minmax_scaler]") {
         mm.fit(X);
         auto result = mm.transform(X);
 
-        int elements_correct = nc::sum<int>(nc::equal(expected, result).astype<int>())(0, 0);
+        int elements_correct = nc::sum<int>(nc::isclose(expected, result).astype<int>())(0, 0);
 
         REQUIRE(elements_correct == expected.shape().rows * expected.shape().cols);
 
