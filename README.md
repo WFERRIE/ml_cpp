@@ -1,13 +1,30 @@
-# ml_cpp
+# ML_CPP
+Welcome to ml_cpp, a personal project aimed at creating a simple but powerful machine learning library in c++. Drawing inspiration from [scikit-learn](https://scikit-learn.org/stable/), this library is designed for ease of use, modularity, and extensibility.
 
-The purpose of this project is to get better at c++ while better understanding the underlying math behind a lot of machine learning models we take for granted. I really love sklearn, so I'm going to try to keep the syntax somewhat similar to that. 
+## Features
+### Classification
+- Logistic Regression with Regularization
+- Support Vector Machines [in progress]
 
+### Regression
+- Linear Regression with Regularization
+- Random-Forest Regressor [in progress]
 
-To do:
-1. SVM
-2. RFC / RFR
-3. CV
-4. KMeans
-5. Scaler
-6. refactor all _get() methods to just be get_params()
-7. change y_true to always be ints for classifiers
+### Metrics
+- accuracy_score
+- confusion_matrix
+- f1_score
+- precision_score
+- recall_score
+- max_error
+- mean_absolute_error
+- mean_squared_error
+
+### Preprocessing
+- standard_scaler
+- minmax_scaler
+
+### Utilities
+- read_csv
+- dataset class
+- cross_validation [in progress]
