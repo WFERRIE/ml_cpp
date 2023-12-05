@@ -93,7 +93,7 @@ int main() {
 
     // kmeans k = kmeans(n_clusters, max_iter, tol);
 
-    // auto final_labels = k.fit(X, false);
+    // auto final_labels = k.fit(X);
 
     // std::cout << final_labels << std::endl;
 
