@@ -4,26 +4,39 @@
 #include <sstream>
 #include "../include/utils.hpp"
 
-nc::NdArray<double> read_csv(const std::string& filename) {
+nc::NdArray<double> read_csv(const std::string& filepath, bool skip_header) {
+    /*
+    Helper function to read a .csv file and insert its contents into an NumCpp Array.
+    Note that this function assumes the .csv file contains headers, meaning the first 
+    line of the .csv file is skipped.
 
-    std::vector<std::vector<double>> data;  // Vector to store the CSV data
-    nc::NdArray<double> matrix;
+    Parameters
+    ----------
+    filepath: path to the .csv file.
 
-    // Open the CSV file
-    std::ifstream file(filename);
+    Returns 
+    ---------
+    matrix: the contents of the .csv file in a NumCpp array.
+
+    */
+
+    std::vector<std::vector<double>> data;  // vec to store the .csv data
+    nc::NdArray<double> matrix; // matrix to put data into and return
+
+    
+    std::ifstream file(filepath); // open the .csv file
 
     if (!file.is_open()) {
-        std::cerr << "Error: Unable to open the CSV file." << std::endl;
-        return matrix; // Return an empty vector in case of an error
+        std::cerr << "Error: Unable to open .csv file." << std::endl;
+        return matrix; // empty matrix
     }
 
     std::string line;
-    bool first_line = true;
 
     while (std::getline(file, line)) {
-        if (first_line) {
-            // skip the first line containing headers
-            first_line = false;
+        if (skip_header) {
+            // skip the first line containing header
+            skip_header = false;
 
         } else {
             std::vector<double> row;  // Vector to store each row
@@ -37,7 +50,7 @@ nc::NdArray<double> read_csv(const std::string& filename) {
                     double value = std::stod(cell);
                     row.push_back(value);
                 } catch (const std::invalid_argument&) {
-                    std::cerr << "Error: Invalid data format in the CSV file." << std::endl;
+                    std::cerr << "Error: Invalid data format in .csv file." << std::endl;
                     return matrix;
                 }
             }
@@ -46,7 +59,6 @@ nc::NdArray<double> read_csv(const std::string& filename) {
         }
     }
 
-    // Close the file
     file.close();
 
     const int n_samples = data.size();

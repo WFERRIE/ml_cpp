@@ -26,7 +26,6 @@ class dataset {
         ~dataset();
 
         void train_test_split(double train_size, bool shuffle);
-        // shuffles and splits X and y into X_train and y_train and X_test, and y_test
 
         void set_X(nc::NdArray<double>& new_X);
         void set_y(nc::NdArray<double>& new_y);

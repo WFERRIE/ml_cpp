@@ -10,3 +10,4 @@ To do:
 4. KMeans
 5. Scaler
 6. refactor all _get() methods to just be get_params()
+7. change y_true to always be ints for classifiers

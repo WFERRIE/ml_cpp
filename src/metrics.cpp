@@ -104,6 +104,21 @@ nc::NdArray<double> confusion_matrix(nc::NdArray<double>& y_true, nc::NdArray<do
 
 
 nc::NdArray<double> f1_score(nc::NdArray<double>& y_true, nc::NdArray<double>& y_pred) {
+    /*
+    Calculates the f1 score between true labels (y_true) and predicted labels (y_pred).
+
+    Parameters
+    ----------
+    y_true: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the ground-truth labels
+    y_pred: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the predicted labels as returned by a classifier.
+
+
+    Returns 
+    ----------
+    f1_output: nc::NdArray<double> of shape (1 x n_classes) where the i-th element is the f1 score for the i-th class.
+
+    
+    */
 
     y_true.reshape(-1, 1);
     y_pred.reshape(-1, 1);
@@ -147,6 +162,20 @@ nc::NdArray<double> f1_score(nc::NdArray<double>& y_true, nc::NdArray<double>& y
 }
 
 nc::NdArray<double> precision_score(nc::NdArray<double>& y_true, nc::NdArray<double>& y_pred) {
+    /*
+    Calculates the precision score between true labels (y_true) and predicted labels (y_pred).
+
+    Parameters
+    ----------
+    y_true: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the ground-truth labels
+    y_pred: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the predicted labels as returned by a classifier.
+
+
+    Returns 
+    ----------
+    precision_output: nc::NdArray<double> of shape (1 x n_classes) where the i-th element is the precision score for the i-th class.
+
+    */
     y_true.reshape(-1, 1);
     y_pred.reshape(-1, 1);
 
@@ -179,6 +208,20 @@ nc::NdArray<double> precision_score(nc::NdArray<double>& y_true, nc::NdArray<dou
 
 
 nc::NdArray<double> recall_score(nc::NdArray<double>& y_true, nc::NdArray<double>& y_pred) {
+    /*
+    Calculates the recall score between true labels (y_true) and predicted labels (y_pred).
+
+    Parameters
+    ----------
+    y_true: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the ground-truth labels
+    y_pred: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the predicted labels as returned by a classifier.
+
+
+    Returns 
+    ----------
+    recall_output: nc::NdArray<double> of shape (1 x n_classes) where the i-th element is the recall score for the i-th class.
+
+    */
 
     y_true.reshape(-1, 1);
     y_pred.reshape(-1, 1);
@@ -213,6 +256,20 @@ nc::NdArray<double> recall_score(nc::NdArray<double>& y_true, nc::NdArray<double
 // Regression
 
 double max_error(nc::NdArray<double>& y_true, nc::NdArray<double>& y_pred) {
+    /*
+    Calculates the maximum residual error between the target values (y_true) and estimated target values (y_pred).
+
+    Parameters
+    ----------
+    y_true: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the ground-truth targets.
+    y_pred: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the estimated targets. as returned by a regressor.
+
+
+    Returns 
+    ----------
+    max_error: the maximum error.
+
+    */
 
     nc::NdArray<double> error = y_true - y_pred;
 
@@ -220,6 +277,20 @@ double max_error(nc::NdArray<double>& y_true, nc::NdArray<double>& y_pred) {
 }
 
 double mean_absolute_error(nc::NdArray<double>& y_true, nc::NdArray<double>& y_pred) {
+    /*
+    Calculates the average absolute residual error between the target values (y_true) and estimated target values (y_pred).
+
+    Parameters
+    ----------
+    y_true: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the ground-truth targets.
+    y_pred: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the estimated targets. as returned by a regressor.
+
+
+    Returns 
+    ----------
+    mean_absolute_error: the average absolute residual error.
+
+    */
     
     nc::NdArray<double> error = y_true - y_pred;
 
@@ -228,6 +299,20 @@ double mean_absolute_error(nc::NdArray<double>& y_true, nc::NdArray<double>& y_p
 }
 
 double mean_squared_error(nc::NdArray<double>& y_true, nc::NdArray<double>& y_pred) {
+    /*
+    Calculates the average squared residual error between the target values (y_true) and estimated target values (y_pred).
+
+    Parameters
+    ----------
+    y_true: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the ground-truth targets.
+    y_pred: nc::NdArray<double> of shape (1 x n_samples) or (n_samples x 1). Contains the estimated targets. as returned by a regressor.
+
+
+    Returns 
+    ----------
+    mean_squared_error: the average squared residual error.
+
+    */
 
     nc::NdArray<double> error = y_true - y_pred;
 

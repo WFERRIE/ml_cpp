@@ -10,7 +10,7 @@ class standard_scaler {
         nc::NdArray<double> stds;
         int n_features;
         int n_samples;
-        bool is_fit;
+        bool is_fit = false;
         bool with_mean;
         bool with_std;
         
