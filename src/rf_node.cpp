@@ -7,7 +7,7 @@
 
 
 rf_node::rf_node(int data) : data(data), parent(nullptr), leftchild(nullptr), rightchild(nullptr) {
-    // Constructor implementation...
+    // Constructor
 }
 rf_node::~rf_node() {
 
@@ -30,6 +30,10 @@ int rf_node::get_data() const {
     return data;
 }
 
+
+
+
+
 // setters
 void rf_node::set_parent(rf_node* parent) {
     this->parent = parent;
@@ -42,3 +46,6 @@ void rf_node::set_leftchild(rf_node* leftchild) {
 void rf_node::set_rightchild(rf_node* rightchild) {
     this->rightchild = rightchild;
 }
+
+
+

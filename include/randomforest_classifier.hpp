@@ -4,10 +4,10 @@
 #include "NumCpp.hpp"
 #include <string>
 #include <tuple>
-
+#include "../include/rf_node.hpp"
 class randomforest_classifier {
 
-    private:
+    public:
 
         int n_estimators;
         int max_features;
@@ -16,11 +16,13 @@ class randomforest_classifier {
 
         double compute_entropy(double p);
 
-        void compute_information_gain();
+        std::tuple<nc::NdArray<double>, nc::NdArray<double>, nc::NdArray<double>, nc::NdArray<double>> bootstrap(nc::NdArray<double>& X, nc::NdArray<double>& y);
+
+        double compute_information_gain(nc::NdArray<double>& lc_y_bootstrap, nc::NdArray<double>& rc_y_bootstrap);
 
         void compute_oob_score();
 
-        void find_split();
+        rf_node find_split(nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap, int max_features);
 
         void terminal_node();
 
@@ -34,13 +36,12 @@ class randomforest_classifier {
 
 
 
-    public:
+    // public:
 
         randomforest_classifier();
 
         ~randomforest_classifier();
 
-        std::tuple<nc::NdArray<double>, nc::NdArray<double>, nc::NdArray<double>, nc::NdArray<double>> bootstrap(nc::NdArray<double>& X, nc::NdArray<double>& y);
         void fit(nc::NdArray<double>& X, nc::NdArray<double>& y, bool verbose);
 
         nc::NdArray<double> predict(nc::NdArray<double>& X);  
