@@ -12,6 +12,7 @@ set(SOURCES
     src/metrics.cpp
     src/minmax_scaler.cpp
     src/standard_scaler.cpp
+    src/randomforest_classifier.cpp
     src/utils.cpp
     src/validation.cpp
 )
@@ -24,6 +25,7 @@ set(HEADERS
     include/metrics.hpp
     include/minmax_scaler.hpp
     include/standard_scaler.hpp
+    include/randomforest_classifier.hpp
     include/utils.hpp
     include/validation.hpp
 )
@@ -33,7 +35,8 @@ add_executable(tests
             tests/test_metrics.cpp 
             tests/test_minmax_scaler.cpp 
             tests/test_standard_scaler.cpp
-            tests/test_dataset.cpp)
+            tests/test_dataset.cpp
+            tests/test_randomforest_classifier.cpp)
 
 find_package(NumCpp 2.12.1 REQUIRED)
 find_package (Catch2 3 REQUIRED)

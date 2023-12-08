@@ -201,8 +201,6 @@ TEST_CASE("minmax_scaler test", "[minmax_scaler]") {
 
         int elements_correct = nc::sum<int>(nc::isclose(expected, result).astype<int>())(0, 0);
 
-        std::cout << result << std::endl;
-
         REQUIRE(elements_correct == expected.shape().rows * expected.shape().cols);
 
     }
