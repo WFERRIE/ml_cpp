@@ -15,6 +15,7 @@ set(SOURCES
     src/randomforest_classifier.cpp
     src/utils.cpp
     src/validation.cpp
+    src/rf_node.cpp
 )
 
 # Add the header files for your library
@@ -28,6 +29,7 @@ set(HEADERS
     include/randomforest_classifier.hpp
     include/utils.hpp
     include/validation.hpp
+    include/rf_node.hpp
 )
 
 # Add the executable for your tests
@@ -36,7 +38,8 @@ add_executable(tests
             tests/test_minmax_scaler.cpp 
             tests/test_standard_scaler.cpp
             tests/test_dataset.cpp
-            tests/test_randomforest_classifier.cpp)
+            tests/test_randomforest_classifier.cpp
+            tests/test_rf_node.cpp)
 
 find_package(NumCpp 2.12.1 REQUIRED)
 find_package (Catch2 3 REQUIRED)
