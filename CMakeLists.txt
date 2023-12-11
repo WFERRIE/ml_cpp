@@ -39,7 +39,8 @@ add_executable(tests
             tests/test_standard_scaler.cpp
             tests/test_dataset.cpp
             tests/test_randomforest_classifier.cpp
-            tests/test_rf_node.cpp)
+            tests/test_rf_node.cpp
+            tests/test_utils.cpp)
 
 find_package(NumCpp 2.12.1 REQUIRED)
 find_package (Catch2 3 REQUIRED)

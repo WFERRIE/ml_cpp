@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include "../include/utils.hpp"
+#include <vector>
+#include <unordered_map>
 
 nc::NdArray<double> read_csv(const std::string& filepath, bool skip_header) {
     /*
@@ -74,3 +76,31 @@ nc::NdArray<double> read_csv(const std::string& filepath, bool skip_header) {
 
     return matrix;
 }
+
+
+
+template<typename T>
+T get_most_frequent_element(std::vector<T>& vec) {
+
+    std::unordered_map<T, int> freq_map;
+
+    for (const T& element : vec) {
+        freq_map[element]++;
+    }
+
+
+    T most_freq_element;
+    int max_freq = 0;
+
+    for (const auto& pair : freq_map) {
+        if (pair.second > max_freq) {
+            most_freq_element = pair.first;
+            max_freq = pair.second;
+        }
+    }
+
+    return most_freq_element;
+}
+
+template int get_most_frequent_element(std::vector<int>& vec);
+template double get_most_frequent_element(std::vector<double>& vec);
