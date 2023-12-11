@@ -11,18 +11,20 @@ class rf_node {
         rf_node* parent;
         rf_node* leftchild;
         rf_node* rightchild;
+
         
         
 
     public:
+
         rf_node(int data);
         ~rf_node();
         
         // getters
-        rf_node* get_parent() const;
-        rf_node* get_leftchild() const;
-        rf_node* get_rightchild() const;
-        int get_data() const;
+        rf_node* get_parent();
+        rf_node* get_leftchild();
+        rf_node* get_rightchild();
+        int get_data();
 
 
         // probably is best to keep X and y bootstrap private and access via getters and setters
@@ -34,6 +36,8 @@ class rf_node {
         int split_point;
         int feature_idx;
         double information_gain;
+        bool is_leaf = false;
+        double leaf_value = -1;
 
         
         // setters

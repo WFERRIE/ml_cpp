@@ -21,4 +21,15 @@ TEST_CASE("rf_node test", "[RF NODE]") {
     REQUIRE( node1.get_rightchild()->get_data() == 3 );
     REQUIRE( node1.get_leftchild()->get_leftchild()->get_data() == 4 );
 
+    nc::NdArray<double> a1 = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+
+
+    nc::NdArray<int> a2 = {1, 2, 3, 1, 1, 1, 2, 3, 2};
+    // nc::NdArray<double> preds;
+
+
+    // preds = nc::append(preds, a2, nc::Axis::ROW);
+    // preds = nc::append(preds, a2, nc::Axis::ROW);
+    // preds = nc::append(preds, a2, nc::Axis::ROW);
+
 }

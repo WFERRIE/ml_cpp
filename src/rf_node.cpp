@@ -14,21 +14,22 @@ rf_node::~rf_node() {
 }
 
 // getters
-rf_node* rf_node::get_parent() const {
+rf_node* rf_node::get_parent() {
     return parent;
 }
 
-rf_node* rf_node::get_leftchild() const {
+rf_node* rf_node::get_leftchild() {
     return leftchild;
 }
 
-rf_node* rf_node::get_rightchild() const {
+rf_node* rf_node::get_rightchild() {
     return rightchild;
 }
 
-int rf_node::get_data() const {
+int rf_node::get_data() {
     return data;
 }
+
 
 
 
@@ -46,6 +47,7 @@ void rf_node::set_leftchild(rf_node* leftchild) {
 void rf_node::set_rightchild(rf_node* rightchild) {
     this->rightchild = rightchild;
 }
+
 
 
 

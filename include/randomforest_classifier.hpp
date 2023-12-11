@@ -4,6 +4,7 @@
 #include "NumCpp.hpp"
 #include <string>
 #include <tuple>
+#include <vector>
 #include "../include/rf_node.hpp"
 class randomforest_classifier {
 
@@ -13,6 +14,8 @@ class randomforest_classifier {
         int max_features;
         int max_depth;
         int min_samples_split;
+        std::vector<rf_node*> tree_list;
+        std::vector<double> oob_list;
 
         double compute_entropy(double p);
 
@@ -20,25 +23,22 @@ class randomforest_classifier {
 
         double compute_information_gain(nc::NdArray<double>& lc_y_bootstrap, nc::NdArray<double>& rc_y_bootstrap);
 
-        void compute_oob_score();
+        double compute_oob_score(rf_node* tree, nc::NdArray<double>& X_test, nc::NdArray<double>& y_test);
 
         rf_node find_split(nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap, int max_features);
 
-        void terminal_node();
+        double calculate_terminal_node(rf_node* node);
 
-        void split_node();
+        rf_node split_node(rf_node* node, int max_features, int min_samples_split, int max_depth, int depth);
         
-        void build_tree();
+        rf_node build_tree(nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap);
 
-        void predict_tree();
-
-        void predict_rf();
-
+        double predict_tree(rf_node* tree, nc::NdArray<double> X_test);
 
 
     // public:
 
-        randomforest_classifier();
+        randomforest_classifier(const int n_estimators = 100, const int max_depth = 10, const int min_samples_split = 2, int max_features = -1);
 
         ~randomforest_classifier();
 
