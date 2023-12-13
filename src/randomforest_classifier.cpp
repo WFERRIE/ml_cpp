@@ -7,19 +7,228 @@
 #include <vector>
 #include "../include/utils.hpp"
 #include <math.h>
+#include <random>
 
-double randomforest_classifier::compute_entropy(double p) {
-    /* 
-    Compute the entropy of some probability. 
-    */
-    double entropy;
-    if (p == 0.0 || p == 1.0) {
-        entropy = 0.0;
+
+randomforest_classifier::randomforest_classifier(const int n_estimators, const int max_depth, const int min_samples_split, int max_features) : n_estimators(n_estimators), max_depth(max_depth), min_samples_split(min_samples_split), max_features(max_features) {
+
+}
+
+randomforest_classifier::~randomforest_classifier() {
+
+}
+
+void randomforest_classifier::test_func() {
+
+    for (int i = 0; i < 10; i++) {
+        rf_node* node = new rf_node();
+        node->information_gain = i;
+        tree_list.push_back(node);
     }
+
+
+}
+void randomforest_classifier::fit(nc::NdArray<double>& X_train, nc::NdArray<double>& y_train) {
+    // main fitting function to be called by user
+
+    if (max_features == -1) {
+        // this is the default value, indicating the user didn't specify a max # feats
+        // by default we will use the sqrt of the number of features
+
+        int n_features = X_train.shape().cols;
+        max_features = sqrt(n_features);
+    }
+
+    else if (max_features > X_train.shape().cols) {
+        std::runtime_error("Erorr: max_features is > total number of features in training data.");
+    }
+
+    for (int i = 0; i < n_estimators; i++) {
+        int seed = rand();
+        nc::random::seed(seed);
+
+        rf_node* root = new rf_node();
+        
+        std::cout << "Fitting Estimator #" << i << std::endl;
+
+        auto [X_bootstrapped, y_bootstrapped, X_oob, y_oob] = bootstrap(X_train, y_train);
+
+        build_tree(root, X_bootstrapped, y_bootstrapped);
+
+        tree_list.push_back(root);
+        double oob_score = compute_oob_score(root, X_oob, y_oob);
+        std::cout << oob_score << std::endl;
+        oob_list.push_back(oob_score);
+    }
+}
+
+
+void randomforest_classifier::build_tree(rf_node* root, nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap) {
+    // begin tree building process
+    root->X_bootstrap = X_bootstrap;
+    root->y_bootstrap = y_bootstrap;
+
+    find_split(root);
+    split_node(root, max_features, min_samples_split, max_depth, 1);
+
+    return;
+}
+
+
+void randomforest_classifier::find_split(rf_node* parent_node) {
+
+    nc::NdArray<double> X_bootstrap = parent_node->X_bootstrap;
+    nc::NdArray<double> y_bootstrap = parent_node->y_bootstrap;
+
+    std::set<int> feature_list; // set to keep track of which samples have NOT been sampled
+    int n_features = X_bootstrap.shape().cols;
+    int n_samples = X_bootstrap.shape().rows;
+
+    while (feature_list.size() < max_features) {
+        int i = nc::random::randInt(0, n_features);
+        feature_list.insert(i);
+    }
+
+
+    double best_info_gain = -999999.9;
+    
+    rf_node* left_child = new rf_node(); // create two children nodes for the parent node
+    rf_node* right_child = new rf_node();
+
+    parent_node->set_leftchild(left_child); // set the children as children nodes for the parent
+    parent_node->set_rightchild(right_child);
+
+    for (auto& feat_idx: feature_list) { // for each feature
+        
+        for (int i = 0; i < n_samples; i++) { // for each data point in that feature
+
+            rf_node temp_left_child = rf_node();
+            rf_node temp_right_child = rf_node();
+
+            double split_point = X_bootstrap(i, feat_idx); // this is the value to try splitting at
+
+            for (int j = 0; j < n_samples; j++) {
+                
+                double value = X_bootstrap(j, feat_idx);
+                nc::NdArray<double> X_row = X_bootstrap(j, X_bootstrap.cSlice());
+                nc::NdArray<double> y_row = y_bootstrap(j, y_bootstrap.cSlice());
+
+                if (value <= split_point) {
+                    temp_left_child.X_bootstrap = nc::append(temp_left_child.X_bootstrap, X_row, nc::Axis::ROW);
+                    temp_left_child.y_bootstrap = nc::append(temp_left_child.y_bootstrap, y_row, nc::Axis::ROW);
+                }
+
+                else {
+                    temp_right_child.X_bootstrap = nc::append(temp_right_child.X_bootstrap, X_row, nc::Axis::ROW);
+                    temp_right_child.y_bootstrap = nc::append(temp_right_child.y_bootstrap, y_row, nc::Axis::ROW);
+                }
+
+            }
+
+
+            double split_info_gain = compute_information_gain(temp_left_child.y_bootstrap, temp_right_child.y_bootstrap);
+            // std::cout << "split_info_gain: " << split_info_gain << std::endl;
+
+            if (split_info_gain > best_info_gain) {
+                // update details of best node to split at
+
+                // save the children's bootstrapped data
+                left_child->X_bootstrap = temp_left_child.X_bootstrap;
+                left_child->y_bootstrap = temp_left_child.y_bootstrap;
+                right_child->X_bootstrap = temp_right_child.X_bootstrap;
+                right_child->y_bootstrap = temp_right_child.y_bootstrap;
+
+                // save the children and other relevant info to the main node
+                parent_node->information_gain = split_info_gain;
+                parent_node->feature_idx = feat_idx;
+                parent_node->split_point = split_point;
+
+                best_info_gain = split_info_gain;
+            }
+        }
+    }
+
+    return;
+}
+
+
+void randomforest_classifier::split_node(rf_node* node, int max_features, int min_samples_split, int max_depth, int depth) {
+
+    rf_node* left_child = node->get_leftchild(); // get pointers to the children
+    rf_node* right_child = node->get_rightchild(); // get pointers to the children
+
+    int left_n_samples = (left_child->y_bootstrap).reshape(-1, 1).shape().rows;
+    int right_n_samples = (right_child->y_bootstrap).reshape(-1, 1).shape().rows;
+
+    if (left_n_samples == 0 || right_n_samples == 0) {
+        // if one of our children has no samples left, make the node a leaf node
+        // delete the children
+        delete node->get_leftchild();
+        delete node->get_rightchild();
+        
+        // std::cout << "No samples left: " << left_n_samples << " " << right_n_samples << std::endl;
+        node->leaf_value = calculate_leaf_value(node);
+        node->is_leaf = true;
+
+        // std::cout << "Node has been set to leaf value of: " << node->leaf_value << std::endl;
+        
+        return;
+    }
+
+    else if (depth >= max_depth) {
+        // If we have hit the max depth, make the children leaves and return.
+        // We will make their leaf values based on their samples
+
+        left_child->leaf_value = calculate_leaf_value(left_child);
+        left_child->is_leaf = true;
+
+        right_child->leaf_value = calculate_leaf_value(right_child);
+        right_child->is_leaf = true;
+        // std::cout << "max depth reached" << std::endl;
+        return;
+    }
+
+    // std::cout << "LEFT_N_SAMPLES: " << left_n_samples << std::endl;
+    // std::cout << "RIGHT_N_SAMPLES: " << right_n_samples << std::endl;
+
+    find_split(left_child);
+    find_split(right_child);
+
+    if (left_child->X_bootstrap.shape().rows <= min_samples_split) {
+        // if the left child has less samples than our min_samples_split, set the left child to be a leaf
+
+        // std::cout << "Left child reached min_samples. X_bootstrap shape: " << left_child->X_bootstrap.shape() << std::endl;
+
+        left_child->leaf_value = calculate_leaf_value(left_child);
+        left_child->is_leaf = true;
+
+        // std::cout << "Setting Left Child to leaf value of: " << left_child->leaf_value << std::endl;
+    }
+
     else {
-        entropy = -(p * nc::log2(p) + (1.0 - p) * nc::log2(1 - p));
+        // otherwise, split the left child further
+        // std::cout << "splitting left child at feature: " << left_child->feature_idx << " with info gain: " << left_child->information_gain << std::endl;
+        split_node(left_child, max_features, min_samples_split, max_depth, depth + 1);
     }
-    return entropy;
+
+    if (right_child->X_bootstrap.shape().rows <= min_samples_split) {
+        // if the right child has less samples than our min_samples_split, set the right child to be a leaf
+
+        // std::cout << "Right child reached min_samples. X_bootstrap shape: " << right_child->X_bootstrap.shape() << std::endl;
+        
+        right_child->leaf_value = calculate_leaf_value(right_child);
+        right_child->is_leaf = true;
+        // std::cout << "Setting Right Child to leaf value of: " << right_child->leaf_value << std::endl;
+        
+    }
+
+    else {
+        // otherwise, split the right child further
+        // std::cout << "splitting right child at feature: " << right_child->feature_idx << " with info gain: " << right_child->information_gain << std::endl;
+        split_node(right_child, max_features, min_samples_split, max_depth, depth + 1);
+    }
+    
+    return;
 
 }
 
@@ -70,6 +279,22 @@ double randomforest_classifier::compute_information_gain(nc::NdArray<double>& lc
     ig = ig_parent - ig_left - ig_right;
 
     return ig;
+}
+
+
+double randomforest_classifier::compute_entropy(double p) {
+    /* 
+    Compute the entropy of some probability. 
+    */
+    double entropy;
+    if (p == 0.0 || p == 1.0) {
+        entropy = 0.0;
+    }
+    else {
+        entropy = -(p * nc::log2(p) + (1.0 - p) * nc::log2(1 - p));
+    }
+    return entropy;
+
 }
 
 
@@ -163,11 +388,9 @@ double randomforest_classifier::compute_oob_score(rf_node* tree, nc::NdArray<dou
     int correct_labels = 0;
     int n_samples = X_oob.shape().rows;
 
-    std::cout << "oob score, n_samples: " << n_samples << std::endl;
     for (int i = 0; i < n_samples; i++) {
-        std::cout << "predicting tree" << std::endl;
         double prediction = predict_tree(tree, X_oob(i, X_oob.cSlice()));
-        std::cout << "tree has been predicted" << std::endl;
+        std::cout << "prediction: " << prediction << std::endl;
         if (prediction == y_oob(i, y_oob.cSlice())) {
             correct_labels += 1;
         }
@@ -177,182 +400,14 @@ double randomforest_classifier::compute_oob_score(rf_node* tree, nc::NdArray<dou
 }
 
 
-void randomforest_classifier::find_split(rf_node* parent_node) {
-
-    nc::NdArray<double> X_bootstrap = parent_node->X_bootstrap;
-    nc::NdArray<double> y_bootstrap = parent_node->y_bootstrap;
-
-    std::set<int> feature_list; // set to keep track of which samples have NOT been sampled
-    int n_features = X_bootstrap.shape().cols;
-    int n_samples = X_bootstrap.shape().rows;
-
-    while (feature_list.size() < max_features) {
-        int i = nc::random::randInt(0, n_features);
-        feature_list.insert(i);
-    }
-
-
-    double best_info_gain = -999999.9;
-    
-    rf_node* left_child = new rf_node(); // create two children nodes for the parent node
-    rf_node* right_child = new rf_node();
-
-    parent_node->set_leftchild(left_child); // set the children as children nodes for the parent
-    parent_node->set_rightchild(right_child);
-
-    for (auto& feat_idx: feature_list) { // for each feature
-        
-        for (int i = 0; i < n_samples; i++) { // for each data point in that feature
-
-            rf_node temp_left_child = rf_node();
-            rf_node temp_right_child = rf_node();
-
-            double split_point = X_bootstrap(i, feat_idx); // this is the value to try splitting at
-
-            for (int j = 0; j < n_samples; j++) {
-                
-                double value = X_bootstrap(j, feat_idx);
-                nc::NdArray<double> X_row = X_bootstrap(j, X_bootstrap.cSlice());
-                nc::NdArray<double> y_row = y_bootstrap(j, y_bootstrap.cSlice());
-
-                if (value <= split_point) {
-                    temp_left_child.X_bootstrap = nc::append(temp_left_child.X_bootstrap, X_row, nc::Axis::ROW);
-                    temp_left_child.y_bootstrap = nc::append(temp_left_child.y_bootstrap, y_row, nc::Axis::ROW);
-                }
-
-                else {
-                    temp_right_child.X_bootstrap = nc::append(temp_right_child.X_bootstrap, X_row, nc::Axis::ROW);
-                    temp_right_child.y_bootstrap = nc::append(temp_right_child.y_bootstrap, y_row, nc::Axis::ROW);
-                }
-
-            }
-
-            double split_info_gain = compute_information_gain(temp_right_child.y_bootstrap, temp_right_child.y_bootstrap);
-
-            if (split_info_gain > best_info_gain) {
-                // update details of best node to split at
-
-                // save the children's bootstrapped data
-                left_child->X_bootstrap = temp_left_child.X_bootstrap;
-                left_child->y_bootstrap = temp_left_child.y_bootstrap;
-                right_child->X_bootstrap = temp_right_child.X_bootstrap;
-                right_child->y_bootstrap = temp_right_child.y_bootstrap;
-
-                // save the children and other relevant info to the main node
-                parent_node->information_gain = split_info_gain;
-                parent_node->feature_idx = feat_idx;
-                parent_node->split_point = split_point;
-
-                best_info_gain = split_info_gain;
-            }
-        }
-        
-
-    }
-
-    return;
-}
-
-
 double randomforest_classifier::calculate_leaf_value(rf_node* node) {
-    auto y_bootstrap = (*node).y_bootstrap;
-    return nc::mean(y_bootstrap)(0, 0);
-}
+    nc::NdArray<double> y_bootstrap = (*node).y_bootstrap;
 
+    auto y_vec = y_bootstrap.toStlVector();
 
-void randomforest_classifier::split_node(rf_node* node, int max_features, int min_samples_split, int max_depth, int depth) {
+    double f = get_most_frequent_element(y_vec);
 
-    rf_node* left_child = node->get_leftchild(); // get pointers to the children
-    rf_node* right_child = node->get_rightchild(); // get pointers to the children
-
-    int left_n_samples = (left_child->y_bootstrap).reshape(-1, 1).shape().rows;
-    int right_n_samples = (right_child->y_bootstrap).reshape(-1, 1).shape().rows;
-
-    std::cout << "LEFT_N_SAMPLES: " << left_n_samples << std::endl;
-    std::cout << "RIGHT_N_SAMPLES: " << right_n_samples << std::endl;
-
-
-    if (left_n_samples == 0 || right_n_samples == 0) {
-        // if one of our children has no samples left, make the children leaves and return
-        
-        nc::NdArray<double> parent_y_boostrap = nc::append(left_child->y_bootstrap, right_child->y_bootstrap, nc::Axis::ROW);
-        
-
-        // we set the leaf value based on the parent's data, because one of our children is empty
-        left_child->y_bootstrap = parent_y_boostrap;
-        right_child->y_bootstrap = parent_y_boostrap;
-
-        left_child->is_leaf = true;
-        left_child->leaf_value = calculate_leaf_value(left_child);
-
-        right_child->is_leaf = true;
-        right_child->leaf_value = calculate_leaf_value(right_child);
-        
-        return;
-    }
-
-    else if (depth >= max_depth) {
-        // If we have hit the max depth, make the children leaves and return.
-        // We will make their leaf values based on their samples
-
-        left_child->leaf_value = calculate_leaf_value(left_child);
-        left_child->is_leaf = true;
-
-        right_child->leaf_value = calculate_leaf_value(right_child);
-        right_child->is_leaf = true;
-
-        return;
-    }
-
-    find_split(left_child);
-    find_split(right_child);
-
-    if (left_child->X_bootstrap.shape().rows <= min_samples_split) {
-        // if the left child has less samples than our min_samples_split, set the left child to be a leaf
-
-        left_child->leaf_value = calculate_leaf_value(left_child);
-        left_child->is_leaf = true;
-    }
-
-    else {
-        // otherwise, split the left child further
-        find_split(left_child);
-        split_node(left_child, max_features, min_samples_split, max_depth, depth + 1);
-    }
-
-    if (right_child->X_bootstrap.shape().rows <= min_samples_split) {
-        // if the right child has less samples than our min_samples_split, set the right child to be a leaf
-        
-        right_child->leaf_value = calculate_leaf_value(right_child);
-        right_child->is_leaf = true;
-    }
-
-    else {
-        // otherwise, split the right child further
-        find_split(right_child);
-        split_node(right_child, max_features, min_samples_split, max_depth, depth + 1);
-    }
-    
-    return;
-
-}
-
-
-
-rf_node randomforest_classifier::build_tree(nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap) {
-    // begin tree building process
-
-    rf_node* root = new rf_node(); // dynamically allocate a root node
-
-    root->X_bootstrap = X_bootstrap;
-    root->y_bootstrap = y_bootstrap;
-
-    find_split(root);
-
-    std::cout << "CALLING split_node from within build_tree" << std::endl;
-    split_node(root, max_features, min_samples_split, max_depth, 1);
-
-    return *root;
+    return f;
 }
 
 
@@ -372,69 +427,25 @@ double randomforest_classifier::predict_tree(rf_node* tree, nc::NdArray<double> 
     leaf_value: the class predicted by the tree on sample X_sample
     */ 
 
-    X_sample.reshape(1, -1); // ensure sample is in row format
-
-    int feature_idx = (*tree).feature_idx; // index of feature to decide on
-
-    std::cout << "feature_idx: " << feature_idx << std::endl;
-
-    if (X_sample(0, feature_idx) <= (*tree).split_point) { // check if we want to go to the left or right child
-        // if our value is <= the split point
-        std::cout << "value less than split point" << std::endl;
-        if (tree->is_leaf) {
-            std::cout << "tree is leaf, returning leaf value" << std::endl;
-            return tree->leaf_value;
-        }
-        else {            
-            std::cout << "tree is not leaf, recursively calling predict_tree" << std::endl;
-            return predict_tree(tree->get_leftchild(), X_sample);
-        }
+    if (tree->is_leaf) {
+        return tree->leaf_value;
     }
+
     else {
-        // if our value is > than the split point
-        std::cout << "value greater than split point" << std::endl;
-        if (tree->is_leaf) {
-            std::cout << "tree is leaf, returning leaf value" << std::endl;
-            return tree->leaf_value;
-        }
+
+        X_sample.reshape(1, -1); // ensure sample is in row format
+
+        int feature_idx = tree->feature_idx; // index of feature to decide on
+
+        if (X_sample(0, feature_idx) <= tree->split_point) { // check if we want to go to the left or right child
+            // if our value is <= the split point
+            return predict_tree(tree->get_leftchild(), X_sample);
+            }
+
         else {
-            std::cout << "tree is not leaf, recursively calling predict_tree" << std::endl;
+            // if our value is > than the split point
             return predict_tree(tree->get_rightchild(), X_sample);
-        }
-    }
-}
-
-
-randomforest_classifier::randomforest_classifier(const int n_estimators, const int max_depth, const int min_samples_split, int max_features) : n_estimators(n_estimators), max_depth(max_depth), min_samples_split(min_samples_split), max_features(max_features) {
-
-}
-
-randomforest_classifier::~randomforest_classifier() {
-
-}
-
-void randomforest_classifier::fit(nc::NdArray<double>& X_train, nc::NdArray<double>& y_train) {
-    // main fitting function to be called by user
-
-    if (max_features == -1) {
-        // this is the default value, indicating the user didn't specify a max # feats
-        // by default we will use the sqrt of the number of features
-
-        int n_features = X_train.shape().cols;
-        max_features = sqrt(n_features);
-    }
-
-    for (int i = 0; i < n_estimators; i++) {
-        auto [X_bootstrapped, y_bootstrapped, X_oob, y_oob] = bootstrap(X_train, y_train);
-        std::cout << "bootstrapped successfully" << std::endl;
-        rf_node tree = build_tree(X_bootstrapped, y_bootstrapped);
-        std::cout << "built tree successfully" << std::endl;
-        tree_list.push_back(&tree);
-        std::cout << "tree has been pushed back" << std::endl;
-        double oob_score = compute_oob_score(&tree, X_oob, y_oob);
-        std::cout << "oob score computed" << std::endl;
-        oob_list.push_back(oob_score);
-        std::cout << "oob pushed" << std::endl;
+            }
     }
 }
 

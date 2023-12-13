@@ -5,7 +5,7 @@
 #include <string>
 #include "NumCpp.hpp"
 
-nc::NdArray<double> read_csv(const std::string& filename);
+nc::NdArray<double> read_csv(const std::string& filename, bool skip_header);
 
 template<typename T>
 T get_most_frequent_element(std::vector<T>& vec);

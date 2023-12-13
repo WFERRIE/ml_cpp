@@ -10,7 +10,7 @@ rf_node::rf_node() : leftchild(nullptr), rightchild(nullptr) {
     // Constructor
 }
 rf_node::~rf_node() {
-
+    // std::cout << "NODE IS BEING DESTROYED" << std::endl;
 }
 
 // getters
@@ -29,6 +29,7 @@ rf_node* rf_node::get_rightchild() {
 int rf_node::get_data() {
     return data;
 }
+
 
 
 

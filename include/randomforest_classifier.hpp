@@ -31,9 +31,11 @@ class randomforest_classifier {
 
         void split_node(rf_node* node, int max_features, int min_samples_split, int max_depth, int depth);
         
-        rf_node build_tree(nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap);
+        void build_tree(rf_node* root, nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap);
 
         double predict_tree(rf_node* tree, nc::NdArray<double> X_test);
+
+        void test_func();
 
 
     // public:
