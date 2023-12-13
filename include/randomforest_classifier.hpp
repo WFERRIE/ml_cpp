@@ -23,13 +23,13 @@ class randomforest_classifier {
 
         double compute_information_gain(nc::NdArray<double>& lc_y_bootstrap, nc::NdArray<double>& rc_y_bootstrap);
 
-        double compute_oob_score(rf_node* tree, nc::NdArray<double>& X_test, nc::NdArray<double>& y_test);
+        double compute_oob_score(rf_node* tree, nc::NdArray<double>& X_oob, nc::NdArray<double>& y_oob);
 
-        rf_node find_split(nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap, int max_features);
+        void find_split(rf_node* node);
 
-        double calculate_terminal_node(rf_node* node);
+        double calculate_leaf_value(rf_node* node);
 
-        rf_node split_node(rf_node* node, int max_features, int min_samples_split, int max_depth, int depth);
+        void split_node(rf_node* node, int max_features, int min_samples_split, int max_depth, int depth);
         
         rf_node build_tree(nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap);
 
@@ -42,7 +42,7 @@ class randomforest_classifier {
 
         ~randomforest_classifier();
 
-        void fit(nc::NdArray<double>& X, nc::NdArray<double>& y, bool verbose);
+        void fit(nc::NdArray<double>& X, nc::NdArray<double>& y);
 
         nc::NdArray<double> predict(nc::NdArray<double>& X);  
 

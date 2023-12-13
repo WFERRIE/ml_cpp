@@ -17,7 +17,7 @@ class rf_node {
 
     public:
 
-        rf_node(int data);
+        rf_node();
         ~rf_node();
         
         // getters
@@ -33,8 +33,9 @@ class rf_node {
         // here to make the randomforest code cleaner
         nc::NdArray<double> X_bootstrap;
         nc::NdArray<double> y_bootstrap;
+
         int split_point;
-        int feature_idx;
+        int feature_idx = -1;
         double information_gain;
         bool is_leaf = false;
         double leaf_value = -1;

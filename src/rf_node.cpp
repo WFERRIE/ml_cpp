@@ -6,7 +6,7 @@
 
 
 
-rf_node::rf_node(int data) : data(data), parent(nullptr), leftchild(nullptr), rightchild(nullptr) {
+rf_node::rf_node() : leftchild(nullptr), rightchild(nullptr) {
     // Constructor
 }
 rf_node::~rf_node() {
