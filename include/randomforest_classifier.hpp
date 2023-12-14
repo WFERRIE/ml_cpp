@@ -33,7 +33,7 @@ class randomforest_classifier {
         
         void build_tree(rf_node* root, nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap);
 
-        double predict_tree(rf_node* tree, nc::NdArray<double> X_test);
+        double predict_sample(rf_node* tree, nc::NdArray<double> X_test);
 
         void test_func();
 

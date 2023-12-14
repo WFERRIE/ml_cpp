@@ -57,7 +57,6 @@ void randomforest_classifier::fit(nc::NdArray<double>& X_train, nc::NdArray<doub
 
         tree_list.push_back(root);
         double oob_score = compute_oob_score(root, X_oob, y_oob);
-        std::cout << oob_score << std::endl;
         oob_list.push_back(oob_score);
     }
 }
@@ -127,7 +126,6 @@ void randomforest_classifier::find_split(rf_node* parent_node) {
 
 
             double split_info_gain = compute_information_gain(temp_left_child.y_bootstrap, temp_right_child.y_bootstrap);
-            // std::cout << "split_info_gain: " << split_info_gain << std::endl;
 
             if (split_info_gain > best_info_gain) {
                 // update details of best node to split at
@@ -188,11 +186,14 @@ void randomforest_classifier::split_node(rf_node* node, int max_features, int mi
         return;
     }
 
-    // std::cout << "LEFT_N_SAMPLES: " << left_n_samples << std::endl;
-    // std::cout << "RIGHT_N_SAMPLES: " << right_n_samples << std::endl;
+    std::cout << "LEFT_N_SAMPLES: " << left_n_samples << std::endl;
+    std::cout << "RIGHT_N_SAMPLES: " << right_n_samples << std::endl;
 
     find_split(left_child);
     find_split(right_child);
+
+    // std::cout << "left child info: " << left_child->feature_idx << " " << left_child->split_point << std::endl;
+    // std::cout << "right child info: " << right_child->feature_idx << " " << right_child->split_point << std::endl;
 
     if (left_child->X_bootstrap.shape().rows <= min_samples_split) {
         // if the left child has less samples than our min_samples_split, set the left child to be a leaf
@@ -389,9 +390,10 @@ double randomforest_classifier::compute_oob_score(rf_node* tree, nc::NdArray<dou
     int n_samples = X_oob.shape().rows;
 
     for (int i = 0; i < n_samples; i++) {
-        double prediction = predict_tree(tree, X_oob(i, X_oob.cSlice()));
-        std::cout << "prediction: " << prediction << std::endl;
-        if (prediction == y_oob(i, y_oob.cSlice())) {
+        double y_pred = predict_sample(tree, X_oob(i, X_oob.cSlice()));
+        double y_true = y_oob(i, y_oob.cSlice())(0, 0);
+
+        if (y_pred == y_true) {
             correct_labels += 1;
         }
     }
@@ -411,7 +413,7 @@ double randomforest_classifier::calculate_leaf_value(rf_node* node) {
 }
 
 
-double randomforest_classifier::predict_tree(rf_node* tree, nc::NdArray<double> X_sample) {
+double randomforest_classifier::predict_sample(rf_node* tree, nc::NdArray<double> X_sample) {
     /*
     use tree to predict label
 
@@ -437,14 +439,19 @@ double randomforest_classifier::predict_tree(rf_node* tree, nc::NdArray<double> 
 
         int feature_idx = tree->feature_idx; // index of feature to decide on
 
-        if (X_sample(0, feature_idx) <= tree->split_point) { // check if we want to go to the left or right child
+        double val = X_sample(0, feature_idx);
+        double sp = tree->split_point;
+
+        // std::cout << val << " | " << sp << std::endl; 
+
+        if (val <= sp) { // check if we want to go to the left or right child
             // if our value is <= the split point
-            return predict_tree(tree->get_leftchild(), X_sample);
+            return predict_sample(tree->get_leftchild(), X_sample);
             }
 
         else {
             // if our value is > than the split point
-            return predict_tree(tree->get_rightchild(), X_sample);
+            return predict_sample(tree->get_rightchild(), X_sample);
             }
     }
 }
@@ -461,7 +468,7 @@ nc::NdArray<double> randomforest_classifier::predict(nc::NdArray<double>& X) {
         std::vector<double> ensemble_results;
         for (int j = 0; j < n_trees; j++) {
             rf_node* tree_ptr = tree_list[j];
-            double pred = predict_tree(tree_ptr, X(i, X.cSlice()));
+            double pred = predict_sample(tree_ptr, X(i, X.cSlice()));
             ensemble_results.push_back(pred);
         }
 

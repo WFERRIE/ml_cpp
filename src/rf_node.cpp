@@ -26,10 +26,6 @@ rf_node* rf_node::get_rightchild() {
     return rightchild;
 }
 
-int rf_node::get_data() {
-    return data;
-}
-
 
 
 

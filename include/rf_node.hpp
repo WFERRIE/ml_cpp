@@ -7,7 +7,6 @@
 
 class rf_node {
     private:
-        int data;
         rf_node* parent;
         rf_node* leftchild;
         rf_node* rightchild;
@@ -24,7 +23,6 @@ class rf_node {
         rf_node* get_parent();
         rf_node* get_leftchild();
         rf_node* get_rightchild();
-        int get_data();
 
 
         // probably is best to keep X and y bootstrap private and access via getters and setters
@@ -34,7 +32,7 @@ class rf_node {
         nc::NdArray<double> X_bootstrap;
         nc::NdArray<double> y_bootstrap;
 
-        int split_point;
+        double split_point;
         int feature_idx = -1;
         double information_gain;
         bool is_leaf = false;

@@ -8,6 +8,7 @@
 #include "../include/rf_node.hpp"
 #include "../include/utils.hpp"
 #include "../include/dataset.hpp"
+#include "../include/metrics.hpp"
 
 
 void my_function(rf_node* node) {
@@ -97,19 +98,24 @@ TEST_CASE("rfc Test", "[Randomforest Classifier]") {
 
     SECTION (".fit()") {
 
-        nc::NdArray<double> data = read_csv("../data/iris_binary.csv", true);
+        nc::NdArray<double> data = read_csv("../data/tree_data_fixed.csv", false);
 
         dataset DS = dataset(data);
 
-        DS.train_test_split(0.8, false);
+        DS.train_test_split(0.2, true);
 
-        nc::NdArray<double> X_train = DS.get_X();
-        nc::NdArray<double> y_train = DS.get_y();
+        nc::NdArray<double> X_train = DS.get_X_train();
+        nc::NdArray<double> y_train = DS.get_y_train();
+
+        nc::NdArray<double> X_test = DS.get_X_test();
+        nc::NdArray<double> y_test = DS.get_y_test();
+
+
 
         int n_estimators = 4;
         int max_depth = 5;
-        int min_samples_split = 2;
-        int max_features = 2;
+        int min_samples_split = 10;
+        int max_features = 5;
 
 
 
@@ -121,85 +127,25 @@ TEST_CASE("rfc Test", "[Randomforest Classifier]") {
         rfc.fit(X_train, y_train);
 
 
-
-
-        for (auto n : rfc.tree_list) {
+        for (int i = 0; i < n_estimators; i++) {
+            auto n = rfc.tree_list[i];
+            auto oob = rfc.oob_list[i];
             std::cout << "root.feature_idx: " << n->feature_idx << std::endl;
             std::cout << "root.information_gain: " << n->information_gain << std::endl;
             std::cout << "root.split_point: " << n->split_point << std::endl;
+            std::cout << "oob score: " << oob << std::endl;
             std::cout << "\n" << std::endl;
+
         }
 
-        for (auto n : rfc.oob_list) { 
-            std::cout << n << std::endl;
-        }
+        auto y_pred = rfc.predict(X_test);
 
-
-
-
-
-
-        // auto X_sample = nc::NdArray<double>({1, 0.5, 1.2});
-
-        // std::cout << "completed training" << std::endl;
-        
-        // double pred = rfc.predict_tree(root, X_sample);
-
-        // std::cout << "prediction:" << std::endl;
-
-        // rf_node* root = new rf_node();
-
-        // my_function(root);
-
-        // std::cout << root->information_gain << std::endl;
-        // std::cout << root->get_leftchild()->is_leaf << std::endl;
+        std::cout << "f1_score: " << f1_score(y_test, y_pred) << std::endl;
+        std::cout << "accuracy_score: " << accuracy_score(y_test, y_pred) << std::endl;
 
         
 
     }
 
-
-
-
-
-
-    // auto [a1_bootstrapped, b1_bootstrapped, a1_oob, b1_oob] = rfc.bootstrap(a1, b1);
-
-    // rfc.find_split(a1_bootstrapped, b1_bootstrapped, 2);
-    
     
 }
-
-// int n_estimators;
-// int max_features;
-// int max_depth;
-// int min_samples_split;
-// std::vector<rf_node*> tree_list;
-// std::vector<double> oob_list;
-
-// std::tuple<nc::NdArray<double>, nc::NdArray<double>, nc::NdArray<double>, nc::NdArray<double>> bootstrap(nc::NdArray<double>& X, nc::NdArray<double>& y);
-
-// double compute_information_gain(nc::NdArray<double>& lc_y_bootstrap, nc::NdArray<double>& rc_y_bootstrap);
-
-// double compute_oob_score(rf_node* tree, nc::NdArray<double>& X_test, nc::NdArray<double>& y_test);
-
-// rf_node find_split(nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap, int max_features);
-
-// double calculate_terminal_node(rf_node* node);
-
-// rf_node split_node(rf_node* node, int max_features, int min_samples_split, int max_depth, int depth);
-
-// rf_node build_tree(nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap);
-
-// double predict_tree(rf_node* tree, nc::NdArray<double> X_test);
-
-
-// // public:
-
-// randomforest_classifier(const int n_estimators = 100, const int max_depth = 10, const int min_samples_split = 2, int max_features = -1);
-
-// ~randomforest_classifier();
-
-// void fit(nc::NdArray<double>& X, nc::NdArray<double>& y, bool verbose);
-
-// nc::NdArray<double> predict(nc::NdArray<double>& X); 
