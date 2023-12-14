@@ -4,7 +4,7 @@ Welcome to ml_cpp, a personal project aimed at creating a simple but powerful ma
 ## Features
 ### Classification
 - Logistic Regression with Regularization
-- Support Vector Machines [in progress]
+- Random-Forest Classifier
 
 ### Regression
 - Linear Regression with Regularization
