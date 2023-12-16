@@ -18,16 +18,7 @@ randomforest_classifier::~randomforest_classifier() {
 
 }
 
-void randomforest_classifier::test_func() {
 
-    for (int i = 0; i < 10; i++) {
-        rf_node* node = new rf_node();
-        node->information_gain = i;
-        tree_list.push_back(node);
-    }
-
-
-}
 void randomforest_classifier::fit(nc::NdArray<double>& X_train, nc::NdArray<double>& y_train) {
     // main fitting function to be called by user
 

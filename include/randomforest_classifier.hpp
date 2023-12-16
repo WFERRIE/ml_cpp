@@ -35,8 +35,6 @@ class randomforest_classifier {
 
         double predict_sample(rf_node* tree, nc::NdArray<double> X_test);
 
-        void test_func();
-
 
     // public:
 

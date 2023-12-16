@@ -12,23 +12,35 @@ TEST_CASE("rf_node test", "[RF NODE]") {
         rf_node node3 = rf_node();
         rf_node node4 = rf_node();
 
+        node1.data = 1;
+        node2.data = 2;
+        node3.data = 3;
+        node4.data = 4;
+
         node1.set_leftchild(&node2);
         node1.set_rightchild(&node3);
 
         node2.set_leftchild(&node4);
 
+    }
 
+    SECTION("Testing node destructor") {
+        rf_node* node1 = new rf_node();
+        rf_node* node2 = new rf_node();
+        rf_node* node3 = new rf_node();
+        rf_node* node4 = new rf_node();
 
-        nc::NdArray<double> a1 = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        node1->data = 1;
+        node2->data = 2;
+        node3->data = 3;
+        node4->data = 4;
 
+        node1->set_leftchild(node2);
+        node1->set_rightchild(node3);
 
-        nc::NdArray<int> a2 = {1, 2, 3, 1, 1, 1, 2, 3, 2};
-        // nc::NdArray<double> preds;
+        node2->set_leftchild(node4);
 
-
-        // preds = nc::append(preds, a2, nc::Axis::ROW);
-        // preds = nc::append(preds, a2, nc::Axis::ROW);
-        // preds = nc::append(preds, a2, nc::Axis::ROW);
+        delete node1;
 
     }
 

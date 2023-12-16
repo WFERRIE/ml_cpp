@@ -11,11 +11,19 @@ class rf_node {
         rf_node* leftchild;
         rf_node* rightchild;
 
+        int child_assignment = 0;
+        // the child_assignment value is used in the destructor. A value of 0 indicates that
+        // this node is not the child of any other node. A value of 1 indicates it is the left child
+        // of another node. A 2 indicates it is the right child of another node.
+
+
+        void set_parent(rf_node* parent);
         
         
 
     public:
 
+        int data = -1;
         rf_node();
         ~rf_node();
         
@@ -40,7 +48,6 @@ class rf_node {
 
         
         // setters
-        void set_parent(rf_node* parent);
         void set_leftchild(rf_node* leftchild);
         void set_rightchild(rf_node* rightchild);
 

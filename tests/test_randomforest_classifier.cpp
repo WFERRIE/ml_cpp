@@ -10,19 +10,6 @@
 #include "../include/dataset.hpp"
 #include "../include/metrics.hpp"
 
-
-void my_function(rf_node* node) {
-    rf_node* left_child = new rf_node();
-
-    left_child->is_leaf = true;
-
-    node->set_leftchild(left_child);
-    node->information_gain = 5;
-
-    return;
-
-}
-
 // should test what happens in bootstrap() if there if the oob set is of size 0
 TEST_CASE("rfc Test", "[Randomforest Classifier]") {
 
@@ -102,7 +89,7 @@ TEST_CASE("rfc Test", "[Randomforest Classifier]") {
 
         dataset DS = dataset(data);
 
-        DS.train_test_split(0.2, true);
+        DS.train_test_split(0.05, true);
 
         nc::NdArray<double> X_train = DS.get_X_train();
         nc::NdArray<double> y_train = DS.get_y_train();
@@ -120,11 +107,11 @@ TEST_CASE("rfc Test", "[Randomforest Classifier]") {
 
 
         randomforest_classifier rfc = randomforest_classifier(n_estimators, max_depth, min_samples_split, max_features);
-        
+    
 
-
-        // rfc.test_func();
         rfc.fit(X_train, y_train);
+
+        std::cout << "fit success" << std::endl;
 
 
         for (int i = 0; i < n_estimators; i++) {
@@ -139,6 +126,9 @@ TEST_CASE("rfc Test", "[Randomforest Classifier]") {
         }
 
         auto y_pred = rfc.predict(X_test);
+
+        std::cout << "y_test: " << y_test.shape() << std::endl;
+        std::cout << "y_pred: " << y_pred.shape() << std::endl;
 
         std::cout << "f1_score: " << f1_score(y_test, y_pred) << std::endl;
         std::cout << "accuracy_score: " << accuracy_score(y_test, y_pred) << std::endl;
