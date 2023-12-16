@@ -133,8 +133,6 @@ TEST_CASE("rfc Test", "[Randomforest Classifier]") {
         std::cout << "f1_score: " << f1_score(y_test, y_pred) << std::endl;
         std::cout << "accuracy_score: " << accuracy_score(y_test, y_pred) << std::endl;
 
-        
-
     }
 
     

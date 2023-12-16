@@ -11,6 +11,7 @@ rf_node::rf_node() : leftchild(nullptr), rightchild(nullptr), parent(nullptr){
 
 
 rf_node::~rf_node() {
+    std::cout << "deleting a node" << std::endl;
     // destructor recursively deletes a node and its children
     if (leftchild != nullptr) {
         // if node has a leftchild, recursively call its destructor and then set the leftchild ptr to nullptr

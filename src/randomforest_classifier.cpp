@@ -15,7 +15,11 @@ randomforest_classifier::randomforest_classifier(const int n_estimators, const i
 }
 
 randomforest_classifier::~randomforest_classifier() {
-
+    if (is_fit) {
+        for (auto t : tree_list) {
+            delete t;
+        }
+    }
 }
 
 
@@ -50,6 +54,8 @@ void randomforest_classifier::fit(nc::NdArray<double>& X_train, nc::NdArray<doub
         double oob_score = compute_oob_score(root, X_oob, y_oob);
         oob_list.push_back(oob_score);
     }
+
+    is_fit = true;
 }
 
 
@@ -449,6 +455,9 @@ double randomforest_classifier::predict_sample(rf_node* tree, nc::NdArray<double
 
 
 nc::NdArray<double> randomforest_classifier::predict(nc::NdArray<double>& X) {
+    if (!is_fit) { 
+        std::runtime_error("Error: Estimator has not been fit. Please call .fit() method before calling .predict() method.");
+    }
 
     nc::NdArray<double> predictions;
 

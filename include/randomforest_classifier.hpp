@@ -16,6 +16,7 @@ class randomforest_classifier {
         int min_samples_split;
         std::vector<rf_node*> tree_list;
         std::vector<double> oob_list;
+        bool is_fit = false;
 
         double compute_entropy(double p);
 
