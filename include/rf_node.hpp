@@ -16,14 +16,11 @@ class rf_node {
         // this node is not the child of any other node. A value of 1 indicates it is the left child
         // of another node. A 2 indicates it is the right child of another node.
 
-
         void set_parent(rf_node* parent);
-        
-        
+
 
     public:
-
-        int data = -1;
+        int data = -1; // unused attribute - useful for debugging and testing.
         rf_node();
         ~rf_node();
         

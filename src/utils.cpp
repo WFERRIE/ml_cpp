@@ -81,6 +81,8 @@ nc::NdArray<double> read_csv(const std::string& filepath, bool skip_header) {
 
 template<typename T>
 T get_most_frequent_element(std::vector<T>& vec) {
+    // returns the most frequently occuring element 
+    // in input vector vec. Vec may hold either integers or doubles.
 
     std::unordered_map<T, int> freq_map;
 

@@ -6,12 +6,11 @@
 
 
 rf_node::rf_node() : leftchild(nullptr), rightchild(nullptr), parent(nullptr){
-    // Constructor
+    // Constructor. By default, rf_node has no children or parent.
 }
 
 
 rf_node::~rf_node() {
-    std::cout << "deleting a node" << std::endl;
     // destructor recursively deletes a node and its children
     if (leftchild != nullptr) {
         // if node has a leftchild, recursively call its destructor and then set the leftchild ptr to nullptr
@@ -63,6 +62,8 @@ void rf_node::set_parent(rf_node* parent) {
 
 
 void rf_node::set_leftchild(rf_node* leftchild) {
+    // set leftchild the be the leftchild of this.
+    // Set child_assignment to be 1 so we can identify leftchild as a leftchild during destruction.
     this->leftchild = leftchild;
     leftchild->child_assignment = 1;
     leftchild->set_parent(this);
@@ -70,6 +71,8 @@ void rf_node::set_leftchild(rf_node* leftchild) {
 
 
 void rf_node::set_rightchild(rf_node* rightchild) {
+    // set rightchild to be the rightchild of this.
+    // Set child_assignment to 2 so we can identify rightchild as a rightchild during destruction.
     this->rightchild = rightchild;
     rightchild->child_assignment = 2;
     rightchild->set_parent(this);
