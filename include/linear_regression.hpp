@@ -16,6 +16,7 @@ class linear_regression {
         int init_mode;
         std::string penalty;
         double reg_strength;
+        bool is_fit = false;
 
         double compute_cost(nc::NdArray<double>& X, nc::NdArray<double>& y_pred);
 
