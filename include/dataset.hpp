@@ -18,7 +18,7 @@ class dataset {
 
         bool train_test_set = false;
 
-        nc::NdArray<double> fisher_yates_shuffle(nc::NdArray<double>& input);
+        nc::NdArray<double> fisher_yates_shuffle(nc::NdArray<double>& input); //shuffles input array in-place
 
     public:
         // constructor
@@ -26,9 +26,6 @@ class dataset {
         ~dataset();
 
         void train_test_split(double train_size, bool shuffle);
-
-        void set_X(nc::NdArray<double>& new_X);
-        void set_y(nc::NdArray<double>& new_y);
 
         nc::NdArray<double> get_X();
         nc::NdArray<double> get_y();

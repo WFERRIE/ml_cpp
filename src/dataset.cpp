@@ -15,8 +15,22 @@ dataset::~dataset() {
 
 nc::NdArray<double> dataset::fisher_yates_shuffle(nc::NdArray<double>& input) {
 
-    // shuffle an array, row-wise
+    /*
+    
+    shuffle an array row-wise in-place using the fisher - yates algorithm
+    
+    Parameters
+    ----------
+    input: nc::NdArray to be shuffled.
 
+    Returns 
+    ----------
+    input: nc::NdArray - the original input but shuffled in place.
+
+    Example
+    ---------
+    data = fisher_yates_shuffle(data);
+    */
     int n_samples = input.shape().rows;
 
     for (int i = n_samples - 1; i > 0; i--) {
