@@ -11,10 +11,26 @@
 
 
 randomforest_classifier::randomforest_classifier(const int n_estimators, const int max_depth, const int min_samples_split, int max_features) : n_estimators(n_estimators), max_depth(max_depth), min_samples_split(min_samples_split), max_features(max_features) {
+    /*
+    Constructor for the random forest classifier model.
 
+    Parameters
+    ----------
+    n_estimators: how many decision trees to build in the random forest. Defaults to 10.
+
+    max_depth: maximum depth to which to grow each decision tree. Defaults to 5.
+
+    min_samples_split: the minimum number of training samples at a node to continue growing the tree by splitting that node. Defaults to 5.
+
+    max_features: maximum number of features to consider while growing each decision tree. If left at default value of -1,
+                    max_features will be set to the square root of the total number of features in the training data, cast to an integer value.
+    
+    */
 }
 
 randomforest_classifier::~randomforest_classifier() {
+    // Destructor. Calls the destructor on the root node of each tree in tree_list,
+    // which in turn will recursively call the destructors on all children.
     if (is_fit) {
         for (auto t : tree_list) {
             delete t;
@@ -24,7 +40,32 @@ randomforest_classifier::~randomforest_classifier() {
 
 
 void randomforest_classifier::fit(nc::NdArray<double>& X_train, nc::NdArray<double>& y_train) {
-    // main fitting function to be called by user
+    /*
+    Main fitting function. To be called by the user.
+
+    Parameters
+    ----------
+    X_train: nc::NdArray<double> of size (n_samples, n_features) contianing training data.
+    y_train: nc::NdArray<double> of size (n_samples, 1) or (1, n_samples) containing ground truth labels.
+
+    Returns
+    ----------
+    Nothing, however, sets is_fit flag to true, allowing user to then call the .predict() method.
+
+    Example
+    ----------
+    int n_estimators = 4;
+    int max_depth = 5;
+    int min_samples_split = 10;
+    int max_features = 5;
+
+    randomforest_classifier rfc = randomforest_classifier(n_estimators, max_depth, min_samples_split, max_features);
+
+    rfc.fit(X_train, y_train);
+
+    auto y_pred = rfc.predict(X_test);
+     
+    */
 
     if (max_features == -1) {
         // this is the default value, indicating the user didn't specify a max # feats
@@ -36,6 +77,10 @@ void randomforest_classifier::fit(nc::NdArray<double>& X_train, nc::NdArray<doub
 
     else if (max_features > X_train.shape().cols) {
         std::runtime_error("Erorr: max_features is > total number of features in training data.");
+    }
+
+    else if (max_features <= 0) {
+        std::runtime_error("Error: max_features is <= 0. Please ensure max_features is at least 1.");
     }
 
     for (int i = 0; i < n_estimators; i++) {
@@ -59,8 +104,61 @@ void randomforest_classifier::fit(nc::NdArray<double>& X_train, nc::NdArray<doub
 }
 
 
+nc::NdArray<double> randomforest_classifier::predict(nc::NdArray<double>& X) {
+    /*
+    Function to predict outputs based on input X.
+
+    Parameters
+    ----------
+    X: nc::NdArray<double> of size (n_samples, n_features) containing input data on which to predict.
+
+    Returns
+    ----------
+    y_pred: nc::NdArray<double> of size (n_samples, 1) containing predictions.
+
+    Example
+    ----------
+    int n_estimators = 4;
+    int max_depth = 5;
+    int min_samples_split = 10;
+    int max_features = 5;
+
+    randomforest_classifier rfc = randomforest_classifier(n_estimators, max_depth, min_samples_split, max_features);
+
+    rfc.fit(X_train, y_train);
+
+    auto y_pred = rfc.predict(X_test);
+
+    */
+    if (!is_fit) {
+        std::runtime_error("Error: Estimator has not been fit. Please call .fit() method before calling .predict() method.");
+    }
+
+    nc::NdArray<double> predictions;
+
+    int n_samples = X.shape().rows;
+    int n_trees = tree_list.size();
+
+    for (int i = 0; i < n_samples; i++) {
+        std::vector<double> ensemble_results;
+        for (int j = 0; j < n_trees; j++) {
+            rf_node* tree_ptr = tree_list[j];
+            double pred = predict_sample(tree_ptr, X(i, X.cSlice()));
+            ensemble_results.push_back(pred);
+        }
+
+        // get most frequent value from the ensemble_results
+        nc::NdArray<double> f = { get_most_frequent_element(ensemble_results) };
+        predictions = nc::append(predictions, f, nc::Axis::ROW);
+
+    }
+
+    return predictions;
+}
+
+
 void randomforest_classifier::build_tree(rf_node* root, nc::NdArray<double>& X_bootstrap, nc::NdArray<double>& y_bootstrap) {
-    // begin tree building process
+    // begin tree building process. Bootstraps the data and then performs the splitting process on the root.
     root->X_bootstrap = X_bootstrap;
     root->y_bootstrap = y_bootstrap;
 
@@ -72,6 +170,9 @@ void randomforest_classifier::build_tree(rf_node* root, nc::NdArray<double>& X_b
 
 
 void randomforest_classifier::find_split(rf_node* parent_node) {
+    // finds the optimal point in the data on which to split the data. Saves
+    // this information into the parent_node. This function must be called
+    // on a node before split_node() may be called on that node.
 
     nc::NdArray<double> X_bootstrap = parent_node->X_bootstrap;
     nc::NdArray<double> y_bootstrap = parent_node->y_bootstrap;
@@ -81,6 +182,7 @@ void randomforest_classifier::find_split(rf_node* parent_node) {
     int n_samples = X_bootstrap.shape().rows;
 
     while (feature_list.size() < max_features) {
+        // randomly sample features
         int i = nc::random::randInt(0, n_features);
         feature_list.insert(i);
     }
@@ -98,7 +200,7 @@ void randomforest_classifier::find_split(rf_node* parent_node) {
         
         for (int i = 0; i < n_samples; i++) { // for each data point in that feature
 
-            rf_node temp_left_child = rf_node();
+            rf_node temp_left_child = rf_node(); // temp nodes to split the bootstrapped data into
             rf_node temp_right_child = rf_node();
 
             double split_point = X_bootstrap(i, feat_idx); // this is the value to try splitting at
@@ -109,7 +211,7 @@ void randomforest_classifier::find_split(rf_node* parent_node) {
                 nc::NdArray<double> X_row = X_bootstrap(j, X_bootstrap.cSlice());
                 nc::NdArray<double> y_row = y_bootstrap(j, y_bootstrap.cSlice());
 
-                if (value <= split_point) {
+                if (value <= split_point) { // sort the data into the left or right child based on the split point
                     temp_left_child.X_bootstrap = nc::append(temp_left_child.X_bootstrap, X_row, nc::Axis::ROW);
                     temp_left_child.y_bootstrap = nc::append(temp_left_child.y_bootstrap, y_row, nc::Axis::ROW);
                 }
@@ -148,6 +250,7 @@ void randomforest_classifier::find_split(rf_node* parent_node) {
 
 
 void randomforest_classifier::split_node(rf_node* node, int max_features, int min_samples_split, int max_depth, int depth) {
+    // splits a node. find_split() must be called on node before this function may be used.
 
     rf_node* left_child = node->get_leftchild(); // get pointers to the children
     rf_node* right_child = node->get_rightchild(); // get pointers to the children
@@ -157,72 +260,55 @@ void randomforest_classifier::split_node(rf_node* node, int max_features, int mi
 
     if (left_n_samples == 0 || right_n_samples == 0) {
         // if one of our children has no samples left, make the node a leaf node
-        // delete the children
+        // delete the children as they're now redundant, and set node to be a leaf.
         delete node->get_leftchild();
         delete node->get_rightchild();
         
-        // std::cout << "No samples left: " << left_n_samples << " " << right_n_samples << std::endl;
         node->leaf_value = calculate_leaf_value(node);
         node->is_leaf = true;
-
-        // std::cout << "Node has been set to leaf value of: " << node->leaf_value << std::endl;
         
         return;
     }
 
     else if (depth >= max_depth) {
         // If we have hit the max depth, make the children leaves and return.
-        // We will make their leaf values based on their samples
 
         left_child->leaf_value = calculate_leaf_value(left_child);
         left_child->is_leaf = true;
 
         right_child->leaf_value = calculate_leaf_value(right_child);
         right_child->is_leaf = true;
-        // std::cout << "max depth reached" << std::endl;
         return;
     }
 
-    std::cout << "LEFT_N_SAMPLES: " << left_n_samples << std::endl;
-    std::cout << "RIGHT_N_SAMPLES: " << right_n_samples << std::endl;
+    // std::cout << "LEFT_N_SAMPLES: " << left_n_samples << std::endl;
+    // std::cout << "RIGHT_N_SAMPLES: " << right_n_samples << std::endl;
 
+    // find the split points for the left and right children 
     find_split(left_child);
     find_split(right_child);
-
-    // std::cout << "left child info: " << left_child->feature_idx << " " << left_child->split_point << std::endl;
-    // std::cout << "right child info: " << right_child->feature_idx << " " << right_child->split_point << std::endl;
 
     if (left_child->X_bootstrap.shape().rows <= min_samples_split) {
         // if the left child has less samples than our min_samples_split, set the left child to be a leaf
 
-        // std::cout << "Left child reached min_samples. X_bootstrap shape: " << left_child->X_bootstrap.shape() << std::endl;
-
         left_child->leaf_value = calculate_leaf_value(left_child);
         left_child->is_leaf = true;
-
-        // std::cout << "Setting Left Child to leaf value of: " << left_child->leaf_value << std::endl;
     }
 
     else {
         // otherwise, split the left child further
-        // std::cout << "splitting left child at feature: " << left_child->feature_idx << " with info gain: " << left_child->information_gain << std::endl;
         split_node(left_child, max_features, min_samples_split, max_depth, depth + 1);
     }
 
     if (right_child->X_bootstrap.shape().rows <= min_samples_split) {
         // if the right child has less samples than our min_samples_split, set the right child to be a leaf
 
-        // std::cout << "Right child reached min_samples. X_bootstrap shape: " << right_child->X_bootstrap.shape() << std::endl;
-        
         right_child->leaf_value = calculate_leaf_value(right_child);
         right_child->is_leaf = true;
-        // std::cout << "Setting Right Child to leaf value of: " << right_child->leaf_value << std::endl;
-        
     }
 
     else {
         // otherwise, split the right child further
-        // std::cout << "splitting right child at feature: " << right_child->feature_idx << " with info gain: " << right_child->information_gain << std::endl;
         split_node(right_child, max_features, min_samples_split, max_depth, depth + 1);
     }
     
@@ -348,7 +434,6 @@ std::tuple<nc::NdArray<double>, nc::NdArray<double>, nc::NdArray<double>, nc::Nd
         // pick a random index between 0 (incl) and n_samples (excl)
         int j = nc::random::randInt(0, n_samples);
 
-
         // put the samples at that index into bootstrapped dataset
         nc::NdArray<double> X_slice = X(j, X.cSlice());
         nc::NdArray<double> y_slice = y(j, y.cSlice());
@@ -382,7 +467,7 @@ std::tuple<nc::NdArray<double>, nc::NdArray<double>, nc::NdArray<double>, nc::Nd
 
 
 double randomforest_classifier::compute_oob_score(rf_node* tree, nc::NdArray<double>& X_oob, nc::NdArray<double>& y_oob) {
-    // copmpute the decision tree's score on the out of bag set
+    // compute the decision tree's score on the out-of-bag set
     int correct_labels = 0;
     int n_samples = X_oob.shape().rows;
 
@@ -400,6 +485,8 @@ double randomforest_classifier::compute_oob_score(rf_node* tree, nc::NdArray<dou
 
 
 double randomforest_classifier::calculate_leaf_value(rf_node* node) {
+    // this function is called when setting a node to be a leaf. Calculates
+    // the most frequently occuring value in the node's data and makes that the leaf value.
     nc::NdArray<double> y_bootstrap = (*node).y_bootstrap;
 
     auto y_vec = y_bootstrap.toStlVector();
@@ -452,32 +539,3 @@ double randomforest_classifier::predict_sample(rf_node* tree, nc::NdArray<double
             }
     }
 }
-
-
-nc::NdArray<double> randomforest_classifier::predict(nc::NdArray<double>& X) {
-    if (!is_fit) { 
-        std::runtime_error("Error: Estimator has not been fit. Please call .fit() method before calling .predict() method.");
-    }
-
-    nc::NdArray<double> predictions;
-
-    int n_samples = X.shape().rows;
-    int n_trees = tree_list.size();
-
-    for (int i = 0; i < n_samples; i++) {
-        std::vector<double> ensemble_results;
-        for (int j = 0; j < n_trees; j++) {
-            rf_node* tree_ptr = tree_list[j];
-            double pred = predict_sample(tree_ptr, X(i, X.cSlice()));
-            ensemble_results.push_back(pred);
-        }
-
-        // get most frequent value from the ensemble_results
-        nc::NdArray<double> f = {get_most_frequent_element(ensemble_results)};
-        predictions = nc::append(predictions, f, nc::Axis::ROW);
-        
-    }
-
-    return predictions;
-}
-
