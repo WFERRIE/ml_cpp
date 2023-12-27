@@ -10,7 +10,8 @@
 #include <random>
 
 
-randomforest_classifier::randomforest_classifier(const int n_estimators, const int max_depth, const int min_samples_split, int max_features) : n_estimators(n_estimators), max_depth(max_depth), min_samples_split(min_samples_split), max_features(max_features) {
+randomforest_classifier::randomforest_classifier(const int n_estimators, const int max_depth, const int min_samples_split, int max_features, bool verbose) : 
+                        n_estimators(n_estimators), max_depth(max_depth), min_samples_split(min_samples_split), max_features(max_features), verbose(verbose) {
     /*
     Constructor for the random forest classifier model.
 
@@ -84,19 +85,24 @@ void randomforest_classifier::fit(nc::NdArray<double>& X_train, nc::NdArray<doub
     }
 
     for (int i = 0; i < n_estimators; i++) {
-        int seed = rand();
+        int seed = rand(); // reseed randomizer
         nc::random::seed(seed);
 
         rf_node* root = new rf_node();
-        
-        std::cout << "Fitting Estimator #" << i << std::endl;
 
+        if (verbose) {
+            std::cout << "Fitting Estimator #" << i << std::endl;
+        }
+        
         auto [X_bootstrapped, y_bootstrapped, X_oob, y_oob] = bootstrap(X_train, y_train);
 
         build_tree(root, X_bootstrapped, y_bootstrapped);
 
         tree_list.push_back(root);
         double oob_score = compute_oob_score(root, X_oob, y_oob);
+        if (verbose) {
+            std::cout << "oob score: " << oob_score << std::endl;
+        }
         oob_list.push_back(oob_score);
     }
 

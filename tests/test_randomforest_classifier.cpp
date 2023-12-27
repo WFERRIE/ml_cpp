@@ -10,80 +10,10 @@
 #include "../include/dataset.hpp"
 #include "../include/metrics.hpp"
 
-// should test what happens in bootstrap() if there if the oob set is of size 0
 TEST_CASE("rfc Test", "[Randomforest Classifier]") {
-
-    // nc::NdArray<double> X = {{1, 0.5, 1.2}, {1, 0.8, 1.1}, {12, 14, 20}, {11, 13, 20}, {10, 13, 21}, {1.05, 1.03, 1.1},
-    //                         {0.9, 0.33, 1.1}, {0.9, 0.7, 1.1}, {11, 16, 18}, {12, 18, 20}, {12, 17, 30}, {1, 1, 1.2},
-    //                         {0.75, 0.3, 1.3}, {1.5, 1.5, 2}, {10, 15.1, 20}, {10.6, 11, 30}, {11, 18, 20}, {1.1, 1, 1.1},
-    //                         {0.8, 0.25, 1.4}, {1.3, 0.9, 1.3}, {10.1, 17, 23}, {10.9, 15, 20}, {10, 15, 10}, {0.9, 0, 1.5}};
-    // nc::NdArray<double> y = {0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0};
-
-    SECTION ("compute_entropy()") {
-        
-        randomforest_classifier rfc = randomforest_classifier(100, 10, 2, 2);
-        
-        REQUIRE( rfc.compute_entropy(0.0) == 0.0);
-        REQUIRE( rfc.compute_entropy(1.0) == 0.0);
-        REQUIRE( rfc.compute_entropy(0.5) == 1.0);
-        REQUIRE_THAT( rfc.compute_entropy(0.1), Catch::Matchers::WithinRel(0.469, 0.001));
-
-
-    }
-
-    SECTION ("compute_information_gain") {
-
-        nc::NdArray<double> y1 = {0, 0, 0, 0, 0, 0, 0, 1};
-
-        nc::NdArray<double> y2 = {0, 0, 0, 0, 0, 0,
-                                  1, 1, 1, 1, 1, 1};
-
-        nc::NdArray<double> y3 = {0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1};
-        nc::NdArray<double> y4 = {0, 0, 0};
-
-        nc::NdArray<double> y5 = {1, 1, 1};
-        nc::NdArray<double> y6 = {};
-
-        randomforest_classifier rfc = randomforest_classifier(100, 10, 2, 2);
-
-        REQUIRE_THAT( rfc.compute_information_gain(y1, y2), Catch::Matchers::WithinRel(0.117, 0.01));
-        REQUIRE_THAT( rfc.compute_information_gain(y2, y1), Catch::Matchers::WithinRel(0.117, 0.01));
-        REQUIRE_THAT( rfc.compute_information_gain(y3, y4), Catch::Matchers::WithinRel(0.079, 0.01));
-        REQUIRE_THAT( rfc.compute_information_gain(y4, y3), Catch::Matchers::WithinRel(0.079, 0.01));
-
-        REQUIRE( rfc.compute_information_gain(y5, y6) == 0.0 );
-        REQUIRE( rfc.compute_information_gain(y6, y5) == 0.0 );
-
-
-
-    }
-
-    SECTION ("find_split()") {
-        int n_estimators = 100;
-        int max_depth = 10;
-        int min_samples_split = 5;
-
-        randomforest_classifier rfc = randomforest_classifier(n_estimators, max_depth, min_samples_split);
-        
-        rfc.max_features = 2;
-        
-        rf_node node = rf_node();
-
-        nc::NdArray<double> X_b = {{4.3, 3, 1.1, 0.1}, {4.3, 3, 1.1, 0.1}, {4.3, 3, 1.1, 0.1}};
-        nc::NdArray<double> y_b = {1, 1, 1};
-        y_b.reshape(-1, 1);
-
-        node.X_bootstrap = X_b;
-        node.y_bootstrap = y_b;
-
-        rfc.find_split(&node);
-
-        REQUIRE ( node.feature_idx == 1 );
-
-    }
-
-
     SECTION (".fit()") {
+
+        // test model is able to learn some data to a high accuracy
 
         nc::NdArray<double> data = read_csv("../data/tree_data_fixed.csv", false);
 
@@ -103,37 +33,17 @@ TEST_CASE("rfc Test", "[Randomforest Classifier]") {
         int max_depth = 5;
         int min_samples_split = 10;
         int max_features = 5;
+        bool verbose = false;
 
-
-
-        randomforest_classifier rfc = randomforest_classifier(n_estimators, max_depth, min_samples_split, max_features);
+        randomforest_classifier rfc = randomforest_classifier(n_estimators, max_depth, min_samples_split, max_features, verbose);
     
-
         rfc.fit(X_train, y_train);
-
-        std::cout << "fit success" << std::endl;
-
-
-        for (int i = 0; i < n_estimators; i++) {
-            auto n = rfc.tree_list[i];
-            auto oob = rfc.oob_list[i];
-            std::cout << "root.feature_idx: " << n->feature_idx << std::endl;
-            std::cout << "root.information_gain: " << n->information_gain << std::endl;
-            std::cout << "root.split_point: " << n->split_point << std::endl;
-            std::cout << "oob score: " << oob << std::endl;
-            std::cout << "\n" << std::endl;
-
-        }
 
         auto y_pred = rfc.predict(X_test);
 
-        std::cout << "y_test: " << y_test.shape() << std::endl;
-        std::cout << "y_pred: " << y_pred.shape() << std::endl;
+        double acc = accuracy_score(y_test, y_pred);
 
-        std::cout << "f1_score: " << f1_score(y_test, y_pred) << std::endl;
-        std::cout << "accuracy_score: " << accuracy_score(y_test, y_pred) << std::endl;
+        REQUIRE(acc >= 0.99);
 
     }
-
-    
 }

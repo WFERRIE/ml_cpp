@@ -22,6 +22,10 @@ TEST_CASE("rf_node test", "[RF NODE]") {
 
         node2.set_leftchild(&node4);
 
+        REQUIRE(node1.get_leftchild()->get_leftchild()->data == 4);
+        REQUIRE(node1.get_leftchild()->data == 2);
+        REQUIRE(node1.get_rightchild()->data == 3);
+
     }
 
     SECTION("Testing node destructor") {
