@@ -10,8 +10,8 @@
 #include <random>
 
 
-randomforest_classifier::randomforest_classifier(const int n_estimators, const int max_depth, const int min_samples_split, int max_features, bool verbose) : 
-                        n_estimators(n_estimators), max_depth(max_depth), min_samples_split(min_samples_split), max_features(max_features), verbose(verbose) {
+randomforest_classifier::randomforest_classifier(const int n_estimators, const int max_depth, const int min_samples_split, int max_features) : 
+                        n_estimators(n_estimators), max_depth(max_depth), min_samples_split(min_samples_split), max_features(max_features) {
     /*
     Constructor for the random forest classifier model.
 
@@ -40,7 +40,7 @@ randomforest_classifier::~randomforest_classifier() {
 }
 
 
-void randomforest_classifier::fit(nc::NdArray<double>& X_train, nc::NdArray<double>& y_train) {
+void randomforest_classifier::fit(nc::NdArray<double>& X_train, nc::NdArray<double>& y_train, bool verbose) {
     /*
     Main fitting function. To be called by the user.
 

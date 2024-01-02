@@ -35,9 +35,9 @@ TEST_CASE("rfc Test", "[Randomforest Classifier]") {
         int max_features = 5;
         bool verbose = false;
 
-        randomforest_classifier rfc = randomforest_classifier(n_estimators, max_depth, min_samples_split, max_features, verbose);
+        randomforest_classifier rfc = randomforest_classifier(n_estimators, max_depth, min_samples_split, max_features);
     
-        rfc.fit(X_train, y_train);
+        rfc.fit(X_train, y_train, verbose);
 
         auto y_pred = rfc.predict(X_test);
 

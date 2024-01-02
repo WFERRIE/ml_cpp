@@ -9,9 +9,9 @@
 class randomforest_classifier {
 
     public:
-        randomforest_classifier(const int n_estimators = 10, const int max_depth = 5, const int min_samples_split = 5, int max_features = -1, bool verbose = false);
+        randomforest_classifier(const int n_estimators = 10, const int max_depth = 5, const int min_samples_split = 5, int max_features = -1);
         ~randomforest_classifier();
-        void fit(nc::NdArray<double>& X, nc::NdArray<double>& y);
+        void fit(nc::NdArray<double>& X, nc::NdArray<double>& y, bool verbose);
         nc::NdArray<double> predict(nc::NdArray<double>& X);
 
 
