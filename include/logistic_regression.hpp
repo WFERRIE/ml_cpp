@@ -17,6 +17,8 @@ class logistic_regression {
         std::string penalty;
         double reg_strength;
 
+        bool is_fit = false;
+
         double compute_BCE_cost(nc::NdArray<double>& predictions, nc::NdArray<double>& y);
 
         nc::NdArray<double> sigmoid(nc::NdArray<double>& z);

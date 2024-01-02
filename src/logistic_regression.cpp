@@ -36,11 +36,11 @@ nc::NdArray<double> logistic_regression::sigmoid(nc::NdArray<double>& z) {
 logistic_regression::logistic_regression(const std::string penalty, const double reg_strength, const int max_iters, const double lr, const double tol, const int init_mode) : penalty(penalty), reg_strength(reg_strength), max_iters(max_iters), lr(lr), tol(tol), init_mode(init_mode) {
     // constructor
     if (lr <= 0) {
-        throw std::runtime_error("Learning rate must be greater than 0.");
+        std::runtime_error("Learning rate must be greater than 0.");
     }
 
     if (max_iters <= 0) {
-        throw std::runtime_error("Number of iterations must be greater than 0.");
+        std::runtime_error("Number of iterations must be greater than 0.");
     }
 
 }
@@ -50,15 +50,23 @@ logistic_regression::~logistic_regression() {
 }
 
 const nc::NdArray<double> logistic_regression::get_weights() const {
+    if (!is_fit) {
+        std::runtime_error("Error: Please call .fit() function before attempting to call any getters.");
+    }
     return weights;
 }
 
 const nc::NdArray<double> logistic_regression::get_bias() const {
+    if (!is_fit) {
+        std::runtime_error("Error: Please call .fit() function before attempting to call any getters.");
+    }
     return bias;
 }
 
 
 void logistic_regression::fit(nc::NdArray<double>& X, nc::NdArray<double>& y, bool verbose) {
+
+    is_fit = true;
 
     nc::uint32 n_samples = X.shape().rows;
     nc::uint32 n_features = X.shape().cols;
@@ -111,22 +119,25 @@ void logistic_regression::fit(nc::NdArray<double>& X, nc::NdArray<double>& y, bo
                 curr_cost = compute_BCE_cost(predictions, binary_labels);
 
                 if (nc::abs(prev_cost - curr_cost) < tol) {
-                    std::cout << "Stopping training early. Training has converged on iteration:" << i << std::endl;
-                    std::cout << "Final Cost:" << curr_cost << std::endl;
+                    if (verbose) {
+                        std::cout << "Stopping training early. Training has converged on iteration:" << i << std::endl;
+                        std::cout << "Final Cost:" << curr_cost << std::endl;
+                    }
+                    
                     break;
+                }
+
+                if (verbose) {
+                    std::cout << "Cost at iteration " << i << ": " << compute_BCE_cost(predictions, binary_labels) << std::endl;
                 }
             }
 
             prev_cost = curr_cost; // update previous cost
 
-            if (verbose == true) {
-                std::cout << "Cost at iteration " << i << ": " << compute_BCE_cost(predictions, binary_labels) << std::endl;
-            }
         }
 
         weights.put(weights.rSlice(), class_idx, temp_weights); //update weights for class that was just trained
         bias.put(bias.rSlice(), class_idx, temp_bias);
-        std::cout << "Ok actual final cost:" << curr_cost << std::endl;
     }
 
 
@@ -143,7 +154,6 @@ nc::NdArray<double> logistic_regression::predict(nc::NdArray<double>& X) {
     nc::NdArray<nc::uint32> predictions_out_int = nc::argmax(predictions, nc::Axis::COL).transpose();
 
     auto predictions_out = predictions_out_int.astype<double>();
-
 
     return predictions_out;
 }
