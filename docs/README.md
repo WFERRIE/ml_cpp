@@ -1,32 +1,56 @@
 # ML_CPP Documentation
 ## Table of Contents
 1. [Preprocessing](#preprocessing)
-1.2 [Data Ingestion](#data_ingestion)
-		1.2.1 [Read CSV](#read_csv)
-		1.2.2 [Dataset](#dataset)
-1.3 [Scalers](#scalers)
-1.3.1 [Standard Scaler](#standard_scaler)
-1.3.2 [Min Max Scaler](#minmax_scaler)
+   
+	1.2 [Data Ingestion](#data_ingestion)
+   
+	1.2.1 [Read CSV](#read_csv)
+   
+	1.2.2 [Dataset](#dataset)
+   
+	1.3 [Scalers](#scalers)
 
-2. [Models](#models)
+	1.3.1 [Standard Scaler](#standard_scaler)
+
+	1.3.2 [Min Max Scaler](#minmax_scaler)
+
+3. [Models](#models)
+   
 	2.1 [Classification](#classification)
-		2.1.1 [Logistic Regression](#logistic_regression)
-		2.1.2 [Random Forest Classifier](#randomforest_classifier)
+   
+	2.1.1 [Logistic Regression](#logistic_regression)
+   
+	2.1.2 [Random Forest Classifier](#randomforest_classifier)
+   
 	2.2 [Regression](#regression)
-		2.2.1 [Linear Regression](#linear_regression)
+   
+	2.2.1 [Linear Regression](#linear_regression)
+   
 	2.3 [Clustering](#clustering)
-		2.3.1 [K Means Clustering](#kmeans)
-3. [Evaluation](#evaluation)
+   
+	2.3.1 [K Means Clustering](#kmeans)
+   
+5. [Evaluation](#evaluation)
+ 
 	3.1 [Classification Metrics](#classification_metrics)
-		3.1.1 [Accuracy Score](#accuracy_score)
-		3.1.2 [F1 Score](#f1_score)
-		3.1.3 [Precision Score](#precision_score)
-		3.1.4 [Recall Score](#recall_score)
-		3.1.5 [confusion_matrix](#confusion_matrix)
+   
+	3.1.1 [Accuracy Score](#accuracy_score)
+   
+	3.1.2 [F1 Score](#f1_score)
+   
+	3.1.3 [Precision Score](#precision_score)
+   
+	3.1.4 [Recall Score](#recall_score)
+   
+	3.1.5 [confusion_matrix](#confusion_matrix)
+   
 	3.2 [Regression Metrics](#regression_metrics)
-		3.2.1 [Max Error](#max_error)
-		3.2.2 [Mean Absolute Error](#mean_absolute_error)
-		3.2.3 [Mean Squared Error](#mean_squared_error)
+   
+	3.2.1 [Max Error](#max_error)
+   
+	3.2.2 [Mean Absolute Error](#mean_absolute_error)
+   
+	3.2.3 [Mean Squared Error](#mean_squared_error)
 
 		
 ## Dependencies
