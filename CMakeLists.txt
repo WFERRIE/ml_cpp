@@ -16,6 +16,8 @@ set(SOURCES
     src/standard_scaler.cpp
     src/utils.cpp
     src/validation.cpp
+    examples/classification.cpp
+    examples/regression.cpp
 )
 
 # Add the header files for your library
@@ -49,11 +51,8 @@ find_package (Catch2 3 REQUIRED)
 # Add the library target
 add_library(ml_cpp ${SOURCES} ${HEADERS})
 
-
-
 # Specify include directories for the library
 target_include_directories(ml_cpp PUBLIC include)
-# target_include_directories(ml_cpp PRIVATE ../NumCpp/include)
 
 # Link the library to the test executable
 target_link_libraries(tests PRIVATE ml_cpp)
