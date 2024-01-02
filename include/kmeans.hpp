@@ -10,6 +10,7 @@ class kmeans {
         int max_iter;
         double tol;
         nc::NdArray<double> centroids;
+        nc::NdArray<double> prev_centroids;
         bool is_fit = false;
 
 
@@ -17,9 +18,9 @@ class kmeans {
 
         double calculate_distance(const nc::NdArray<double>& point1, const nc::NdArray<double>& point2);
 
-        nc::NdArray<nc::uint32> assign_labels(nc::NdArray<double>& X,  nc::NdArray<double>& clusters);
+        nc::NdArray<int> assign_labels(nc::NdArray<double>& X, nc::NdArray<double>& clusters);
 
-        nc::NdArray<double> update_centroids(nc::NdArray<double>& X, nc::NdArray<nc::uint32> labels);
+        nc::NdArray<double> update_centroids(nc::NdArray<double>& X, nc::NdArray<int>& labels);
 
         
     public:
@@ -28,9 +29,9 @@ class kmeans {
 
         ~kmeans();
 
-        void fit(nc::NdArray<double>& X);
+        void fit(nc::NdArray<double>& X, bool verbose);
 
-        nc::NdArray<nc::uint32> predict(nc::NdArray<double>& X);  
+        nc::NdArray<int> predict(nc::NdArray<double>& X);  
 
         nc::NdArray<double> get_centroids();
         

@@ -86,18 +86,7 @@ int main() {
 
 
 
-    // // testing out kmeans
-    // const int n_clusters = 3;
-    // const int max_iter = 100; 
-    // const double tol = 0.001;
 
-    // kmeans k = kmeans(n_clusters, max_iter, tol);
-
-    // auto final_labels = k.fit(X);
-
-    // std::cout << final_labels << std::endl;
-
-    // std::cout << y << std::endl;
 
 
 

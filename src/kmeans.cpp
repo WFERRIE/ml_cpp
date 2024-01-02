@@ -54,7 +54,7 @@ double kmeans::calculate_distance(const nc::NdArray<double>& point1, const nc::N
 
 }
 
-nc::NdArray<nc::uint32> kmeans::assign_labels(nc::NdArray<double>& X, nc::NdArray<double>& clusters) {
+nc::NdArray<int> kmeans::assign_labels(nc::NdArray<double>& X, nc::NdArray<double>& clusters) {
     /*
     Assign all points to their nearest centroid.
     
@@ -87,12 +87,12 @@ nc::NdArray<nc::uint32> kmeans::assign_labels(nc::NdArray<double>& X, nc::NdArra
         }
     }
 
-    nc::NdArray<nc::uint32> labels = nc::argmin(distances, nc::Axis::COL).transpose();
+    nc::NdArray<int> labels = nc::argmin(distances, nc::Axis::COL).transpose().astype<int>();
 
     return labels;
 }
 
-nc::NdArray<double> kmeans::update_centroids(nc::NdArray<double>& X, nc::NdArray<nc::uint32> labels) {
+nc::NdArray<double> kmeans::update_centroids(nc::NdArray<double>& X, nc::NdArray<int>& labels) {
     /*
 
     Move centroids to their new location
@@ -139,25 +139,22 @@ nc::NdArray<double> kmeans::update_centroids(nc::NdArray<double>& X, nc::NdArray
     return new_centroids;
 }
 
-void kmeans::fit(nc::NdArray<double>& X) {
+void kmeans::fit(nc::NdArray<double>& X, bool verbose) {
     /*
     Fitting function to perform k means clustering on input data X.
 
     KMeans algorithm is as follows: On each iteration do the following:
         1. move the centroids to the average location of all points assigned to it
-            update_centroid_locations()
         2. recalculate the assignments
-            assign_labels()
         3. move the centroids to their new average location
-            move_centroids()
         4. check stopping criterion, if not, repeat
-            check_stopping_criterion()
 
 
     Parameters 
     ---------
     X: Input array of shape (n_samples, n_features) on which to perform clustering. n_samples must be
     larger than the number of clusters requested on model instantiation.
+    verbose: boolean representing whether or not to announce when early stopping criterion has been reached.
 
 
     Returns 
@@ -171,32 +168,53 @@ void kmeans::fit(nc::NdArray<double>& X) {
     const int n_clusters = 3;
     const int max_iter = 10000; 
     const double tol = 0.001;
+    const bool verbose = false;
 
     kmeans k = kmeans(n_clusters, max_iter, tol);
 
     k.fit(X);
     nc::NdArray<double> centroids = k.get_centroids();
     */
-         
 
-    nc::NdArray<nc::uint32> labels;
-    nc::NdArray<double> centroids;
+    is_fit = true;
+    nc::NdArray<int> labels;
+
+    centroids = initialize_centroids(X, n_clusters);
+    prev_centroids = centroids;
 
     for (int i = 0; i < max_iter; i++) {
-        centroids = initialize_centroids(X, n_clusters);
-
         labels = assign_labels(X, centroids);
 
-        centroids = update_centroids(X, labels);
+        prev_centroids = centroids; // save previous centroids
+
+        centroids = update_centroids(X, labels); // update current centroids
+
+
+        // check early stopping criteria
+        nc::NdArray<double> centroid_diff = nc::abs(prev_centroids - centroids); // absolute difference in centroid location btwn iters
+
+        double delta = nc::sum<double>(centroid_diff)(0, 0); // the sum of these differences
+        
+        if (verbose) {
+            std::cout << "Iteration: " << i << " Total absolute centroid movement: " << delta << std::endl;
+        }
+
+        // check early stopping criteria
+        if (delta <= tol) {
+            if (verbose) { 
+                std::cout << "K Means has reached early stopping criterion on iteration " << i << std::endl;
+            }
+            break;
+        }
 
     }
 
-    is_fit = true;
+    
 
 }
 
 
-nc::NdArray<nc::uint32> kmeans::predict(nc::NdArray<double>& X) {
+nc::NdArray<int> kmeans::predict(nc::NdArray<double>& X) {
     /*
     Parameters 
     ---------
@@ -232,7 +250,7 @@ nc::NdArray<nc::uint32> kmeans::predict(nc::NdArray<double>& X) {
         std::runtime_error("Error: Number of features in the data passed to .predict() method does not match number of features  in the data passed to .fit() method.");
     }
 
-    nc::NdArray<nc::uint32> labels = assign_labels(X, centroids);
+    nc::NdArray<int> labels = assign_labels(X, centroids);
 
     return labels;
 }
