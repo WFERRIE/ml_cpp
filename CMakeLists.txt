@@ -11,11 +11,11 @@ set(SOURCES
     src/linear_regression.cpp
     src/metrics.cpp
     src/minmax_scaler.cpp
-    src/standard_scaler.cpp
     src/randomforest_classifier.cpp
+    src/rf_node.cpp
+    src/standard_scaler.cpp
     src/utils.cpp
     src/validation.cpp
-    src/rf_node.cpp
 )
 
 # Add the header files for your library
@@ -25,21 +25,22 @@ set(HEADERS
     include/linear_regression.hpp
     include/metrics.hpp
     include/minmax_scaler.hpp
-    include/standard_scaler.hpp
     include/randomforest_classifier.hpp
+    include/rf_node.hpp
+    include/standard_scaler.hpp
     include/utils.hpp
     include/validation.hpp
-    include/rf_node.hpp
 )
 
 # Add the executable for your tests
 add_executable(tests 
+            tests/test_dataset.cpp
+            tests/test_kmeans.cpp
             tests/test_metrics.cpp 
             tests/test_minmax_scaler.cpp 
-            tests/test_standard_scaler.cpp
-            tests/test_dataset.cpp
             tests/test_randomforest_classifier.cpp
             tests/test_rf_node.cpp
+            tests/test_standard_scaler.cpp
             tests/test_utils.cpp)
 
 find_package(NumCpp 2.12.1 REQUIRED)
