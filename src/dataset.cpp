@@ -17,7 +17,7 @@ nc::NdArray<double> dataset::fisher_yates_shuffle(nc::NdArray<double>& input) {
 
     /*
     
-    shuffle an array row-wise in-place using the fisher - yates algorithm
+    shuffle an array row-wise using the fisher - yates algorithm
     
     Parameters
     ----------

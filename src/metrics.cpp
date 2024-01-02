@@ -44,13 +44,6 @@ double accuracy_score(nc::NdArray<double>& y_true, nc::NdArray<double>& y_pred) 
 
 
 nc::NdArray<double> confusion_matrix(nc::NdArray<double>& y_true, nc::NdArray<double>& y_pred) {
-    /*
-    Returns a n_classes x n_classes matrix
-    Rows are true labels
-    Columns are predicted labels
-    In other words, the for confusion matrix C, the value at the i-th row and j-th
-    column, C(i, j) is the number of observations in group i, predicted to be in group j.
-    */
 
     /*
     Returns an n_classes x n_classes confusion matrix of the predictions. 
