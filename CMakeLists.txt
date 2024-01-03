@@ -16,8 +16,6 @@ set(SOURCES
     src/standard_scaler.cpp
     src/utils.cpp
     src/validation.cpp
-    examples/classification.cpp
-    examples/regression.cpp
 )
 
 # Add the header files for your library
@@ -45,6 +43,14 @@ add_executable(tests
             tests/test_standard_scaler.cpp
             tests/test_utils.cpp)
 
+add_executable(classification 
+            examples/classification.cpp)
+
+add_executable(regression 
+            examples/regression.cpp)
+
+
+
 find_package(NumCpp 2.12.1 REQUIRED)
 find_package (Catch2 3 REQUIRED)
 
@@ -60,3 +66,10 @@ target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 target_link_libraries(${PROJECT_NAME}
     NumCpp::NumCpp
 )
+
+# Link the library to the examples
+target_link_libraries(classification PRIVATE ml_cpp)
+target_link_libraries(classification PRIVATE NumCpp::NumCpp)
+
+target_link_libraries(regression PRIVATE ml_cpp)
+target_link_libraries(regression PRIVATE NumCpp::NumCpp)
