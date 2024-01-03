@@ -12,8 +12,13 @@
 int main() {
     // demo
 
+    std::cout << "Runing Regression Example..." << std::endl;
+
+    std::cout << "Importing data" << std::endl;
     // import the data
     nc::NdArray<double> data = read_csv("../data/diabetes_regression.csv", true);
+
+    std::cout << "Loading data into dataset object and splitting into train/test sets" << std::endl;
     dataset DS = dataset(data);
     DS.train_test_split(0.75, true);
 
@@ -23,6 +28,8 @@ int main() {
     nc::NdArray<double> X_test_unscaled = DS.get_X_test();
     nc::NdArray<double> y_test = DS.get_y_test();
 
+
+    std::cout << "Performing data scaling." << std::endl;
     // perform data scaling
     standard_scaler ss = standard_scaler();
     nc::NdArray<double> X_train = ss.fit_transform(X_train_unscaled);
@@ -38,13 +45,15 @@ int main() {
     const int init_mode = 1;
     const bool verbose = false;
 
+    
     linear_regression lin_reg = linear_regression(penalty, reg_strength, max_iters, lr, tol, init_mode);
-
+    std::cout << "Begin training Linear Regressor..." << std::endl;
     lin_reg.fit(X_train, y_train, verbose);
 
     nc::NdArray<double> y_pred = lin_reg.predict(X_test);
 
 
+    std::cout << "Evaluating model performance on test set:" << std::endl;
     // evaluate model performance
     double max_err = max_error(y_test, y_pred);
     double mae = mean_absolute_error(y_test, y_pred);
